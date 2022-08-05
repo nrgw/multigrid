@@ -1,4 +1,4 @@
-# Multigrid for Various Languages
+# Multigrid in Various Languages
 
 ## Boundary Value Problem
 
