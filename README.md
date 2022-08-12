@@ -7,10 +7,19 @@ where $r$ is the radius of spherical coordinate, $\Phi\left(r\right)$ is the gra
 
 ## Density Profile and Boundary Condition
 We give a density profile as
-$$\rho\left(r\right)=\begin{cases} \rho_{c}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r\leq r_{\mathrm{s}} \\\\ 0 &: r>r_{\mathrm{s}} \end{cases}$$
+$$\rho\left(r\right)=\begin{cases} \rho_{c}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}} \\\\ 0 &: r\geq r_{\mathrm{s}} \end{cases}$$
 where $\rho_{\mathrm{c}}$ is the mass density at the center and $r_{\mathrm{s}}$ is the radius of star. Therefore, we give boundary conditions at the center and infinity as
 $$\begin{cases} \frac{d\Phi}{dr}=0 &: r=0 \\\\ \Phi=0 &: r=\infty   \end{cases}$$
 
 ## Coordinate Transformation
+We transform the coordinate $r\in\left[0,\infty\right)$ to $s\in\left[0,1\right)$ by
+$$s=\frac{r/r_{\mathrm{s}}}{1+r/r_{\mathrm{s}}}$$
+Then, we have the equation
+$$\frac{d^{2}\Phi}{ds^{2}}+\frac{2}{s}\frac{d\Phi}{ds}=4\pi\rho \frac{r_{\mathrm{s}}^{2}}{\left(1-s\right)^{4}}$$
+with the density profile
+$$\rho\left(s\right)=\begin{cases} \rho_{c} \left\\{ 1-\left(\frac{s}{1-s}\right)^{2} \right\\} &: 0 \leq s <\frac{1}{2} \\\\ 0 &: \frac{1}{2} \leq s < 1 \end{cases}$$
+and the boundary conditions
+$$\begin{cases} \frac{d\Phi}{ds}=0 &: s=0 \\\\ \Phi=0 &: s=1   \end{cases}$$
+
 
 ## Finite Difference Method
