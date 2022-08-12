@@ -23,9 +23,11 @@ $$\begin{cases} \frac{d\Phi}{ds}=0 &: s=0 \\\\ \Phi=0 &: s=1   \end{cases}$$
 
 
 ## Finite Difference Method
-
-$h=1/N$
-
+Let us consider a discretizaion of the domain $[0,1]$ with uniform $N$ cells. Its adjacent points have coordinates given by
+$$s_{i}=ih$$
+where $h=1/N$ and $i\in\left\\{0,1,\cdots,N\right\\}$. We descritize derivatives in the equation and the boundary conditions as
 $$\frac{d^{2}\Phi}{ds^{2}}+\frac{2}{s}\frac{d\Phi}{ds}=\frac{\Phi_{i+1} + \Phi_{i-1} - 2\Phi_{i}}{h^{2}}+\frac{2}{ih}\frac{\Phi_{i+1}-\Phi_{i-1}}{2h}+O\left(h^{2}\right)$$
-
 $$\frac{d\Phi}{ds}=\frac{1}{h}\left(-\frac{3}{2}\Phi_{0}+2\Phi_{1}-\frac{1}{2}\Phi_{2}\right)+O\left(h^{2}\right)$$
+where $\Phi_{i}=\Phi\left(s_{i}\right)$.
+
+## Relaxation Method
