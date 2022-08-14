@@ -9,9 +9,7 @@ $$\nabla^2 \Phi=4\pi G \rho,$$
 where $\Phi$, $\rho$ and $G$ are the gravitational potential, mass density and gravitational constant, respectively.
 Therefore, the gravitational potential due to a spherically symmetric object can be written in the spherical coordinate:
 $$\frac{d^{2}\Phi}{dr^{2}}+\frac{2}{r}\frac{d\Phi}{dr}=4\pi \rho,$$
-where we set $G=1$, $r$ is the radius of spherical coordinate, $\Phi\left(r\right)$ is the gravitational potential, and $\rho\left(r\right)$ is the mass density.
-
-
+where $r$ is the radius of spherical coordinate, $\Phi\left(r\right)$ is the gravitational potential, $\rho\left(r\right)$ is the mass density, and we set $G=1$.
 
 ## Density Profile and Boundary Condition
 
