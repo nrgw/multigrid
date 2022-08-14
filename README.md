@@ -39,7 +39,7 @@ where $h=1/N$ and $i\in\left\\{0,1,\cdots,N\right\\}$. The subscript "i" represe
 $$\frac{d^{2}\Phi}{ds^{2}}+\frac{2}{s}\frac{d\Phi}{ds}=\frac{\Phi_{i+1} + \Phi_{i-1} - 2\Phi_{i}}{h^{2}}+\frac{2}{ih}\frac{\Phi_{i+1}-\Phi_{i-1}}{2h}+O\left(h^{2}\right)$$
 And at $s=0$, the above equation can be written as
 $$3\frac{d^2\Phi}{ds^2}=6\frac{\Phi_1-\Phi_0}{h^2}+O\left(h^{2}\right).$$
-Here, we use the L'Hospital's Rule to regularize the term $\frac{2}{s}\frac{d\Phi}{ds}$ at $s=0$ since $\frac{d\Phi}{ds}=0$ at $s=0$, and the reflective boundary condition ($\Phi_{-1}=\Phi_{1}$) is also applied.
+Here, we use the L'Hospital's Rule to regularize the term $\frac{2}{s}\frac{d\Phi}{ds}$ at $s=0$ since $\frac{d\Phi}{ds}=0$ at $s=0$, and the reflective boundary condition ( $\Phi_{-1}=\Phi_{1}$ ) is also applied.
 
 ## Relaxation Method
 For $i=N-1$,
