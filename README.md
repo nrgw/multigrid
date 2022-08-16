@@ -55,3 +55,7 @@ For $i=0$,
 $$\Phi_{0}\leftarrow\Phi_{1}-\frac{1}{6}\left(4\pi\rho_{\mathrm{c}}r_{\mathrm{s}}^{2}\right) h^2$$
 For $i\in\left\\{1,2,\cdots,N-1\right\\}$,
 $$\Phi_{i}\leftarrow\frac{1}{2}\left[\left(1+\frac{1}{i}\right)\Phi_{i+1}+\left(1-\frac{1}{i}\right)\Phi_{i-1}-\left(4\pi\rho_{i}\frac{r_{\mathrm{s}}^{2}}{\left(1-s_{i}\right)^{4}}\right)h^{2}\right]$$
+
+## Multigrid Method
+
+
