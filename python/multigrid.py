@@ -8,8 +8,17 @@ def is_positive_integer(x):
 def is_non_negative_integer(x):
     return x >= 0 and isinstance(x, int)
 
+def get_n(x):
+    return int(np.log2(x - 1))
+
+def is_p2_1(x):
+    '''
+        check if x is 2**n + 1 where n is non-negative integer.
+    '''
+    return isinstance(x, int) and x > 1 and x == 2**get_n(x) + 1
+
 class Grid:
-    def __init__(self, x1, x2, val=None, shape=None, size=None):
+    def super__init__(self, x1, x2, val=None, shape=None, size=None):
         '''
             x1: float
             x2: float
@@ -49,22 +58,6 @@ class Grid:
     def rms(self):
         return np.linalg.norm(self.val, ord=2)/np.sqrt(self.size)
 
-    # def copy(self, val=None):
-    #     clone = deepcopy(self)
-    #     if val is not None:
-    #         clone.set_val(val)
-    #     return clone
-
-def get_n(x):
-    return int(np.log2(x - 1))
-
-def is_p2_1(x):
-    '''
-        check if x is 2**n + 1 where n is non-negative integer.
-    '''
-    return isinstance(x, int) and x > 1 and x == 2**get_n(x) + 1
-
-class MultiGrid(Grid):
     def __init__(self, x1, x2, val=None, shape=None, n=None):
         if val is None:
             if shape is None or shape[-1] is None:
@@ -79,17 +72,17 @@ class MultiGrid(Grid):
             if not is_p2_1(val.shape[-1]):
                 raise Exception('shape of val should be (..., 2**n + 1).')
 
-        super().__init__(x1, x2, val=val, shape=shape)
+        self.super__init__(x1, x2, val=val, shape=shape)
         self.n = get_n(self.size)
 
     def fine(self, kind='linear'):
-        finer = MultiGrid(self.x1, self.x2, shape=self.val.shape[:-1]+(None,), n=self.n+1)
+        finer = Grid(self.x1, self.x2, shape=self.val.shape[:-1]+(None,), n=self.n+1)
         finer.set_val(interp1d(self.x, self.val, kind=kind)(finer.x))
         return finer
 
     def coarsen(self):
         val = self.val
-        coarser = MultiGrid(self.x1, self.x2, shape=self.val.shape[:-1]+(None,), n=self.n-1)
+        coarser = Grid(self.x1, self.x2, shape=self.val.shape[:-1]+(None,), n=self.n-1)
         coarser.val[..., 0] = val[..., 0]
         coarser.val[..., -1] = val[..., -1]
         for i in range(1, coarser.size - 1):
@@ -97,18 +90,88 @@ class MultiGrid(Grid):
         return coarser
 
 class BVP:
-    def __init__(self, sol, src, relax, residual):
-        pass
-            
-def multigrid(sol, src, relax, residual):
-    relax(sol, src)
-    if sol.n != 1:
-        err_coarse = MultiGrid(sol.x1, sol.x2, n=sol.n-1)
-        multigrid(err_coarse, residual(sol, src).coarsen(), relax, residual)
-        sol.val += err_coarse.fine().val
-        relax(sol, src)
+    def __init__(self, x1, x2, relax_left_func, relax_middle_func, relax_right_func, res_left_func, res_middle_func, res_right_func, src_func, exact_sol_func=None):
+        self.x1 = x1
+        self.x2 = x2
+        self.relax_left_func = relax_left_func
+        self.relax_middle_func = relax_middle_func
+        self.relax_right_func = relax_right_func
+        self.res_left_func = res_left_func
+        self.res_middle_func = res_middle_func
+        self.res_right_func = res_right_func
+        self.src_func = src_func
+        self.exact_sol_func = exact_sol_func
 
-def fullmultigrid(sol, src, relax, residual):
-    # for i in range(1, sol.n):
-    pass
+class BVPSolver:
+    def __init__(self, bvp, n, src_grid=None, num_iter=(1,1,1)):
+        self.bvp = bvp
+        self.n = n
+        self.sol_grid = Grid(bvp.x1, bvp.x2, n=n)
+        self.src_grid = Grid(bvp.x1, bvp.x2, val=np.array([bvp.src_func(xi) for xi in self.sol_grid.x])) if src_grid is None else src_grid
+        self.num_iter = num_iter
+
+        self.h = self.sol_grid.h
+        self.x = self.sol_grid.x
+        self.N = self.sol_grid.size - 1
+        self.sol_val = self.sol_grid.val
+        self.src_val = self.src_grid.val
+
+    def relax(self):
+        h = self.h
+        x = self.x
+        N = self.N
+        sol_val = self.sol_val
+        src_val = self.src_val
+
+        # Relaxation at the leftmost point
+        sol_val[0] = self.bvp.relax_left_func(sol_val, src_val, x[0], h)
+        # Relaxation at middle points
+        for i in range(1, N):
+            sol_val[i] = self.bvp.relax_middle_func(sol_val, src_val, x[i], h, i)
+        # Relaxation at the rightmost point
+        sol_val[N] = self.bvp.relax_right_func(sol_val, src_val, x[N], h)
+
+    def residual(self):
+        h = self.h
+        x = self.x
+        N = self.N
+        sol_val = self.sol_val
+        src_val = self.src_val
+
+        res = np.zeros(sol_val.shape)
+        # Residual at the leftmost point
+        res[0] = self.bvp.res_left_func(sol_val, src_val, x[0], h)
+        # Residual at middle points
+        for i in range(1, N):
+            res[i] = self.bvp.res_middle_func(sol_val, src_val, x[i], h, i)
+        # Residual at the rightmost point
+        res[N] = self.bvp.res_left_func(sol_val, src_val, x[N], h)
+
+        return Grid(self.sol_grid.x1, self.sol_grid.x2, val=res)
+
+    def multigrid(self):
+        n = self.n
+
+        # Pre-Smoothing
+        for i in range(self.num_iter[0]):
+            self.relax()
+        if n != 1:
+            # Error Correction using Coarse Grid
+            for i in range(self.num_iter[1]):
+                coarse = BVPSolver(self.bvp, n - 1, src_grid=self.residual().coarsen(), num_iter=self.num_iter)
+                coarse.solve()
+                self.sol_val += coarse.sol_grid.fine().val
+
+            # Post-Smoothing
+            for i in range(self.num_iter[2]):
+                self.relax()
+
+    def solve(self):
+        self.multigrid()
+
+    def exact_error(self):
+        if self.bvp.exact_sol_func is None:
+            raise Exception('exact_sol_func is not specified.')
         
+        exact_error = np.array([self.bvp.exact_sol_func(xi) for xi in self.sol_grid.x]) - self.sol_val
+        return Grid(self.sol_grid.x1, self.sol_grid.x2, val=exact_error)
