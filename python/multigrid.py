@@ -70,6 +70,7 @@ class BVPSolver:
         
         self.num_iter = num_iter
 
+        # Aliases
         self.h = self.sol_grid.h
         self.x = self.sol_grid.x
         self.N = self.sol_grid.N
@@ -77,6 +78,7 @@ class BVPSolver:
         self.src_val = self.src_grid.val
 
     def relax(self):
+        # Aliases
         h = self.h
         x = self.x
         N = self.N
@@ -92,6 +94,7 @@ class BVPSolver:
         sol_val[N] = self.bvp.relax_right_func(sol_val, src_val, x[N], h)
 
     def residual(self):
+        # Aliases
         h = self.h
         x = self.x
         N = self.N
@@ -110,15 +113,13 @@ class BVPSolver:
         return Grid(self.bvp.domain, self.n, val=res)
 
     def multigrid(self):
-        n = self.n
-
         # Pre-Smoothing
         for i in range(self.num_iter[0]):
             self.relax()
-        if n != 1:
+        if self.n != 1:
             # Error Correction using Coarse Grid
             for i in range(self.num_iter[1]):
-                coarse = BVPSolver(self.bvp, n - 1, src_grid=self.residual().coarsen(), num_iter=self.num_iter)
+                coarse = BVPSolver(self.bvp, self.n - 1, src_grid=self.residual().coarsen(), num_iter=self.num_iter)
                 coarse.solve()
                 self.sol_val += coarse.sol_grid.fine().val
 
