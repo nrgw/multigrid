@@ -1,5 +1,14 @@
 #  Multigrid Codes in Various Languages
 
+We implement the multigrid method in various languages to compare performance. The languages we used are:
+* Fortran
+* C
+* C++
+* Python
+* Julia
+* Mathematica
+* Rust
+
 ## Problem Setting
 
 ### Spherically Symmetric Star
