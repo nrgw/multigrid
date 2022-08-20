@@ -1,2 +1,4 @@
 python/venv
-__pycache__
+python/__pycache__
+c/star
+c/.vscode
