@@ -1,5 +1,5 @@
 python/venv
 python/__pycache__
 c/star
-c/.vscode
 c/*.o
+.vscode
