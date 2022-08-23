@@ -68,5 +68,4 @@ void bvpsolver_get_residual(BVPSolver *solver);
 void bvpsolver_multigrid(BVPSolver *solver);
 void bvpsolver_solve(BVPSolver *solver);
 Grid *bvpsolver_exact_error(BVPSolver *solver);
-// double bvpsolver_residual_rms(BVPSolver *solver);
 double bvpsolver_exact_error_rms(BVPSolver *solver);
