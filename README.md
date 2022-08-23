@@ -23,7 +23,7 @@ where $r$ is the radius of spherical coordinate, $\Phi\left(r\right)$ is the gra
 ### Density Profile and Boundary Condition
 
 We assume the a density profile profile follows a parabolic function in radius as follows:
-<!-- $$\rho\left(r\right)=\begin{cases} \rho_{c}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}} \\\\ 0 &: r\geq r_{\mathrm{s}} \end{cases},$$ -->
+$$\rho\left(r\right)=\begin{cases} \rho_{c}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}} \\\\ 0 &: r\geq r_{\mathrm{s}} \end{cases},$$
 where $\rho_{\mathrm{c}}$ is the mass density at the center and $r_{\mathrm{s}}$ is the radius of star. We can easily impose two boundary conditions at the center (using symmetry) and infinity (asymptotic behavior of gravitational potential) as
 $$\begin{cases} \frac{d\Phi}{dr}=0 &: r=0 \\\\ \Phi=0 &: r=\infty   \end{cases}.$$
 
