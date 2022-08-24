@@ -57,7 +57,7 @@ $$
     \begin{cases}
         \frac{d\Phi}{ds}=0 &: s=0
         \\ \Phi=0 &: s=1
-    \end{cases}
+    \end{cases}.
 $$
 And the density profile becomes
 $$
@@ -80,14 +80,16 @@ Here, we use the L'Hospital's Rule to regularize the term $\frac{2}{s}\frac{d\Ph
 
 ### Relaxation Method
 For $i=N$, we fix
-$$\Phi_{N}=0$$
+$$
+    \Phi_{N}=0.
+$$
 For $i=0$,
 $$
-    \Phi_{0}\leftarrow\Phi_{1}-\frac{1}{6}\left(4\pi\rho_{\mathrm{c}}r_{\mathrm{s}}^{2}\right) h^2
+    \Phi_{0}\leftarrow\Phi_{1}-\frac{1}{6}\left(4\pi\rho_{\mathrm{c}}r_{\mathrm{s}}^{2}\right) h^2.
 $$
 For $i\in\left\{1,2,\cdots,N-1\right\}$,
 $$
-    \Phi_{i}\leftarrow\frac{1}{2}\left[\left(1+\frac{1}{i}\right)\Phi_{i+1}+\left(1-\frac{1}{i}\right)\Phi_{i-1}-\left(4\pi\rho_{i}\frac{r_{\mathrm{s}}^{2}}{\left(1-s_{i}\right)^{4}}\right)h^{2}\right]
+    \Phi_{i}\leftarrow\frac{1}{2}\left[\left(1+\frac{1}{i}\right)\Phi_{i+1}+\left(1-\frac{1}{i}\right)\Phi_{i-1}-\left(4\pi\rho_{i}\frac{r_{\mathrm{s}}^{2}}{\left(1-s_{i}\right)^{4}}\right)h^{2}\right].
 $$
 
 ## Multigrid Method

@@ -2,4 +2,4 @@ python/venv
 python/__pycache__
 c/star
 c/*.o
-.vscode
+**/.vscode
