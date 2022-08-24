@@ -1,10 +1,10 @@
 #  Multigrid Codes in Various Languages
 
 We implement the multigrid method in various languages to compare performance. The languages we used are:
-* Fortran
-* C
+* **Fortran**
+* **C**
 * C++
-* Python
+* **Python**
 * Julia
 * Mathematica
 * Rust
