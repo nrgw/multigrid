@@ -5,7 +5,7 @@ We implement the multigrid method in various languages to compare performance. T
 * **C**
 * C++
 * **Python**
-* Julia
+* **Julia**
 * Mathematica
 * Rust
 
