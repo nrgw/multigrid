@@ -128,7 +128,7 @@ void BVPSolver::bvpsolver_relax()
     for (int i = 1; i < N; i++)
         sol_val->at(i) = relax_middle_func(sol_val, src_val, x->at(i), h, i);
     // Residual at the rightmost point
-    sol_val->at(N) = relax_left_func(sol_val, src_val, x->at(N), h);
+    sol_val->at(N) = relax_right_func(sol_val, src_val, x->at(N), h);
 }
 void BVPSolver::bvpsolver_get_residual()
 {
@@ -137,7 +137,7 @@ void BVPSolver::bvpsolver_get_residual()
     for (int i = 1; i < N; i++)
         res_val->at(i) = res_middle_func(sol_val, src_val, x->at(i), h, i);
     // Residual at the rightmost point
-    res_val->at(N) = res_left_func(sol_val, src_val, x->at(N), h);
+    res_val->at(N) = res_right_func(sol_val, src_val, x->at(N), h);
 }
 void BVPSolver::bvpsolver_multigrid()
 {
@@ -160,6 +160,11 @@ void BVPSolver::bvpsolver_multigrid()
             }
             delete error_grid;
             delete coarse_solver;
+        }
+
+        for (int j = 0; j < num_iter3; j++)
+        {
+            bvpsolver_relax();
         }
     }
 }
@@ -213,7 +218,7 @@ int main()
 
     for (int i = 0; i < 30; i++)
     {
-        std::cout << string_format(" %f %f", solver.res_grid->grid_rms(), solver.bvpsolver_exact_error_rms()) << std::endl;
+        std::cout << string_format("%d %e %e", i, solver.res_grid->grid_rms(), solver.bvpsolver_exact_error_rms()) << std::endl;
         solver.bvpsolver_solve();
     }
     return 0;

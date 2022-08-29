@@ -53,4 +53,5 @@ void Grid::show()
     {
         std::cout << v << " ";
     }
+    std::cout << std::endl;
 }
