@@ -1,5 +1,9 @@
 #include "multigrid.hpp"
 #include <iostream>
+#include <chrono>
+
+using namespace std;
+using namespace chrono;
 
 const double r_s = 8.;
 const double rho_c = 1.28e-3;
@@ -214,12 +218,19 @@ int main()
     double s1 = 0.;
     double s2 = 1.;
 
-    BVPSolver solver = BVPSolver(s1, s2, 9, NULL, 1, 1, 1);
+    const int number_of_iter = 30;
 
-    for (int i = 0; i < 30; i++)
+    BVPSolver solver = BVPSolver(s1, s2, 16, NULL, 4, 1, 4);
+
+    system_clock::time_point start = system_clock::now();
+    for (int i = 0; i < number_of_iter; i++)
     {
-        std::cout << string_format("%d %e %e", i, solver.res_grid->grid_rms(), solver.bvpsolver_exact_error_rms()) << std::endl;
         solver.bvpsolver_solve();
+        cout << string_format("%d %e %e", i, solver.res_grid->grid_rms(), solver.bvpsolver_exact_error_rms()) << endl;
     }
+    system_clock::time_point end = system_clock::now();
+    seconds m_time = duration_cast<seconds>(end - start);
+
+    cout << string_format("averaged time: %f s", m_time.count() / (double)number_of_iter) << endl;
     return 0;
 }
