@@ -5,7 +5,7 @@ We implement the multigrid method in various languages to compare performance. T
 * **C**
 * C++
 * **Python**
-* Julia
+* **Julia**
 * Mathematica
 * Rust
 
@@ -35,7 +35,7 @@ We assume the a density profile profile follows a parabolic function in radius a
 $$
     \rho\left(r\right)=\begin{cases}
         \rho_{c}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}}
-        \\ 0 &: r\geq r_{\mathrm{s}}
+        \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases},
 $$
 
@@ -44,7 +44,7 @@ where $\rho_{\mathrm{c}}$ is the mass density at the center and $r_{\mathrm{s}}$
 $$
     \begin{cases}
         \frac{d\Phi}{dr}=0 &: r=0
-        \\ \Phi=0 &: r=\infty
+        \\\\ \Phi=0 &: r=\infty
     \end{cases}.
 $$
 
@@ -68,7 +68,7 @@ with the boundary conditions
 $$
     \begin{cases}
         \frac{d\Phi}{ds}=0 &: s=0
-        \\ \Phi=0 &: s=1
+        \\\\ \Phi=0 &: s=1
     \end{cases}.
 $$
 
@@ -77,7 +77,7 @@ And the density profile becomes
 $$
     \rho\left(r\right)=\begin{cases}
         \rho_{c}\left[1-\left(\frac{s}{1-s}\right)^2\right] &: r< r_{\mathrm{s}}
-        \\ 0 &: r\geq r_{\mathrm{s}}
+        \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases}.
 $$
 
