@@ -1,5 +1,6 @@
 #include "multigrid.h"
 #include <stdio.h>
+#include <time.h>
 
 double relax_left_func(double *sol, double *src, double s, double h)
 {
@@ -66,12 +67,15 @@ int main()
     double s1 = 0.;
     double s2 = 1.;
     BVP *bvp = bvp_new(s1, s2, relax_left_func, relax_middle_func, relax_right_func, res_left_func, res_middle_func, res_right_func, src_func, exact_sol_func);
-    BVPSolver *solver = bvpsolver_new(bvp, 9, NULL, 1, 1, 1);
+    BVPSolver *solver = bvpsolver_new(bvp, 16, NULL, 4, 1, 4);
 
-    for (int i = 1; i < 30; i++) {
-        printf("%d %e %e\n", i, grid_rms(solver->res_grid), bvpsolver_exact_error_rms(solver));
+    const int number_of_iter = 30;
+    clock_t start = clock();
+    for (int i = 0; i < number_of_iter; i++) {
         bvpsolver_solve(solver);
+        printf("%d %e %e\n", i, grid_rms(solver->res_grid)*solver->res_grid->h, bvpsolver_exact_error_rms(solver));
     }
+    printf("averaged time: %f s\n",(double)(clock() - start)/CLOCKS_PER_SEC/(double)number_of_iter);
 
     bvpsolver_delete(solver);
     bvp_delete(bvp);
