@@ -3,7 +3,7 @@
 We implement the multigrid method in various languages to compare performance. The languages we used are:
 * **Fortran**
 * **C**
-* C++
+* **C++**
 * **Python**
 * **Julia**
 * Mathematica
