@@ -34,7 +34,7 @@ We assume the a density profile profile follows a parabolic function in radius a
 
 $$
     \rho\left(r\right)=\begin{cases}
-        \rho_{c}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}}
+        \rho_{\mathrm{c}}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}}
         \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases},
 $$
@@ -76,7 +76,7 @@ And the density profile becomes
 
 $$
     \rho\left(r\right)=\begin{cases}
-        \rho_{c}\left[1-\left(\frac{s}{1-s}\right)^2\right] &: r< r_{\mathrm{s}}
+        \rho_{\mathrm{c}}\left[1-\left(\frac{s}{1-s}\right)^2\right] &: r< r_{\mathrm{s}}
         \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases}.
 $$
