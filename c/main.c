@@ -38,7 +38,7 @@ double res_right_func(double *sol, double *src, double s, double h)
 
 const double r_s = 8.;
 const double rho_c = 1.28e-3;
-# define PI 3.14159265358979323846
+#define PI 3.14159265358979323846
 
 double src_func(double s)
 {
