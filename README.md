@@ -34,7 +34,7 @@ We assume the a density profile profile follows a parabolic function in radius a
 
 $$
     \rho\left(r\right)=\begin{cases}
-        \rho_{c}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}}
+        \rho_{\mathrm{c}}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}}
         \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases},
 $$
@@ -49,7 +49,7 @@ $$
 $$
 
 ### Coordinate Transformation
-To cover the spatial infinity ($r=\infty$) in the computational domain, several special coordinate transformation functions are ommonly use for the coordinate compactification.
+To cover the spatial infinity ( $r=\infty$ ) in the computational domain, several special coordinate transformation functions are ommonly use for the coordinate compactification.
 We use the following special function:
 
 $$
@@ -76,7 +76,7 @@ And the density profile becomes
 
 $$
     \rho\left(r\right)=\begin{cases}
-        \rho_{c}\left[1-\left(\frac{s}{1-s}\right)^2\right] &: r< r_{\mathrm{s}}
+        \rho_{\mathrm{c}}\left[1-\left(\frac{s}{1-s}\right)^2\right] &: r< r_{\mathrm{s}}
         \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases}.
 $$
@@ -84,7 +84,7 @@ $$
 ### Finite Difference Method
 Let us consider a discretizaion of the domain $[0,1]$ with uniform $N$ cells. Their adjacent points have coordinates given by
 $$s_{i}=ih,$$
-where $h=1/N$ and $i\in\left\{0,1,\cdots,N\right\}$. The subscript $i$ represents $i$-th grid point starting from $0$. We descritize LHS of the Poisson's equation as follows:
+where $h=1/N$ and $i\in\left\\{0,1,\cdots,N\right\\}$. The subscript $i$ represents $i$-th grid point starting from $0$. We descritize LHS of the Poisson's equation as follows:
 
 $$
     \frac{d^{2}\Phi}{ds^{2}}+\frac{2}{s}\frac{d\Phi}{ds}=\frac{\Phi_{i+1} + \Phi_{i-1} - 2\Phi_{i}}{h^{2}}+\frac{2}{ih}\frac{\Phi_{i+1}-\Phi_{i-1}}{2h}+O\left(h^{2}\right)
@@ -107,7 +107,7 @@ $$
     \Phi_{0}\leftarrow\Phi_{1}-\frac{1}{6}\left(4\pi\rho_{\mathrm{c}}r_{\mathrm{s}}^{2}\right) h^2.
 $$
 
-For $i\in\left\{1,2,\cdots,N-1\right\}$,
+For $i\in\left\\{1,2,\cdots,N-1\right\\}$,
 
 $$
     \Phi_{i}\leftarrow\frac{1}{2}\left[\left(1+\frac{1}{i}\right)\Phi_{i+1}+\left(1-\frac{1}{i}\right)\Phi_{i-1}-\left(4\pi\rho_{i}\frac{r_{\mathrm{s}}^{2}}{\left(1-s_{i}\right)^{4}}\right)h^{2}\right].
