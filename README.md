@@ -49,7 +49,7 @@ $$
 $$
 
 ### Coordinate Transformation
-To cover the spatial infinity ($r=\infty$) in the computational domain, several special coordinate transformation functions are ommonly use for the coordinate compactification.
+To cover the spatial infinity ( $r=\infty$ ) in the computational domain, several special coordinate transformation functions are ommonly use for the coordinate compactification.
 We use the following special function:
 
 $$
