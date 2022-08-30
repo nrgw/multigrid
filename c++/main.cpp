@@ -1,6 +1,7 @@
 #include "multigrid.hpp"
 #include <iostream>
 #include <chrono>
+#include <memory>
 
 using namespace std;
 using namespace chrono;
