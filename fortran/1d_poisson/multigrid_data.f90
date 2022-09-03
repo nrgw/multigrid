@@ -4,7 +4,7 @@ module multigrid_parameters
 
 !------------------------------------------------------------
 
-  integer, parameter :: max_level = 10, base_grid = 3,    &
+  integer, parameter :: max_level = 16, base_grid = 3,    &
                         pre_relax = 4, post_relax = 4,    &
                         n_vcycle = 20
 
@@ -38,6 +38,8 @@ module multigrid_data
                                                    q, src, res, err
 
   end type mg_data_type
+
+  double precision, dimension(:), allocatable :: exact
 
 !------------------------------------------------------------
 
@@ -89,8 +91,13 @@ module multigrid_data
         stop
       endif
 
-
     enddo
+
+    allocate (exact(n), stat = err)
+    if (err /= 0) then
+      write(*,*) "error in memory allocation"
+      stop
+    endif
 
 !--------------------------------------------------
 
@@ -124,6 +131,8 @@ module multigrid_data
                   u(l)%err)
 
     enddo
+
+    deallocate (exact)
 
 !--------------------------------------------------
 
@@ -197,7 +206,7 @@ module multigrid_data
 
     type (mg_data_type) :: u
 
-    double precision :: x, rs2
+    double precision :: x, r_x, rs2, temp
     integer :: i, n
 
 !--------------------------------------------------
@@ -208,16 +217,21 @@ module multigrid_data
     do i = 1, n
 
       u%q(i) = 0.d0
+      exact(i) = 0.d0
 
     enddo
 
     do i = 1, n-1
 
       x = u%x(i)
+      r_x = u%r_x(i)
+      temp = x/(1.d0-x)
       if (x > 5.d-1) then
         u%src(i) = 0.d0
+        exact(i) = -8.d0/15.d0*pi*rho_c*rs2*(r_x-1.d0)
       else
         u%src(i) = 4.d0*pi*rho_c*rs2*(1.d0-(x/(1.d0-x))**2)/(1.d0-x)**4
+        exact(i) = -2.d0*pi*rho_c*rs2*(5.d-1-temp**2/3.d0+1.d-1*temp**4)
       endif
 
     enddo

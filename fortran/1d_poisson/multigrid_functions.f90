@@ -84,8 +84,8 @@ module multigrid_functions
 
 !------------------------------------------------------------
 
-  subroutine residual_norm (nx, dx, dx2, r_dx, r_dx2, x, r_x, q, s,  &
-                            L_1, L_inf)
+  subroutine rms_error (nx, dx, dx2, r_dx, r_dx2, x, r_x, q, s, exact, &
+                        rms_res, rms_exact)
 
 !--------------------------------------------------
 
@@ -93,32 +93,36 @@ module multigrid_functions
     
     integer :: nx
     double precision :: dx, dx2, r_dx, r_dx2
-    double precision :: x(nx), r_x(nx), q(nx), s(nx)
-    double precision :: L_1, L_inf
+    double precision :: x(nx), r_x(nx), q(nx), s(nx), exact(nx)
+    double precision :: rms_res, rms_exact
 
-    double precision :: temp
+    double precision :: temp1, temp2
     integer :: i
 
 !--------------------------------------------------
 
-    L_1 = 0.d0
-    L_inf = 0.d0
+    rms_exact = 0.d0
 
     i = 1
-    temp = abs(s(i)-6.d0*(q(i+1)-q(i))*r_dx2)
-    L_1 = temp
-    L_inf = temp
+    temp1 = s(i)-6.d0*(q(i+1)-q(i))*r_dx2
+    rms_res = temp1**2
 
     do i = 2, nx-1
 
-      temp = abs(s(i)-(q(i+1)-2.d0*q(i)+q(i-1))*r_dx2   &
-                -r_x(i)*(q(i+1)-q(i-1))*r_dx)
-      L_1 = L_1+temp
-      L_inf = dmax1(L_inf,temp)
-    
+      temp1 = (s(i)-(q(i+1)-2.d0*q(i)+q(i-1))*r_dx2   &
+              -r_x(i)*(q(i+1)-q(i-1))*r_dx)
+
+      rms_res = rms_res+temp1**2
+
+    enddo
+
+    do i = 1, nx
+      rms_exact = rms_exact+(q(i)-exact(i))**2
     enddo
     
-    L_1 = L_1/dble(nx)
+    temp2 = 1.d0/dble(nx)
+    rms_res = sqrt(rms_res*temp2)
+    rms_exact = sqrt(rms_exact*temp2)
 
 !--------------------------------------------------
 
@@ -126,7 +130,7 @@ module multigrid_functions
 
 !--------------------------------------------------
 
-  end subroutine residual_norm
+  end subroutine rms_error
 
 !------------------------------------------------------------
 

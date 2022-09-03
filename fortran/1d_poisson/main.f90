@@ -14,9 +14,10 @@ program multigrid_1d
 
   type (mg_data_type) :: mg_data(max_level)
 
-  integer :: i, vcycle, level
+  integer :: i, vcycle, level, j
 
-  double precision :: L_1, L_inf, x
+  double precision :: rms_res, rms_exact
+  real :: t1, t2
 
 !--------------------------------------------------
 
@@ -25,6 +26,10 @@ program multigrid_1d
   call initialize_finest_grid (mg_data(1))
 
 !--------------------------------------------------
+
+  call cpu_time(t1)
+
+  call write_zero (mg_data(1)%nx,mg_data(1)%q)
 
   do vcycle = 1, n_vcycle
 
@@ -35,6 +40,7 @@ program multigrid_1d
     do level = 1, max_level-1
 
       do i = 1, pre_relax
+
         call relaxation (mg_data(level)%nx,     &
                          mg_data(level)%dx,     &
                          mg_data(level)%dx2,    &
@@ -45,7 +51,7 @@ program multigrid_1d
                          mg_data(level)%q,      &
                          mg_data(level)%src)
       enddo
-      
+
       call residual (mg_data(level)%nx,     &
                      mg_data(level)%dx,     &
                      mg_data(level)%dx2,    &
@@ -113,18 +119,19 @@ program multigrid_1d
 
     level = 1
 
-    call residual_norm (mg_data(level)%nx,      &
-                        mg_data(level)%dx,      &
-                        mg_data(level)%dx2,     &
-                        mg_data(level)%r_dx,    &
-                        mg_data(level)%r_dx2,   &
-                        mg_data(level)%x,       &
-                        mg_data(level)%r_x,     &
-                        mg_data(level)%q,       &
-                        mg_data(level)%src,     &
-                        L_1, L_inf)
+    call rms_error (mg_data(level)%nx,      &
+                    mg_data(level)%dx,      &
+                    mg_data(level)%dx2,     &
+                    mg_data(level)%r_dx,    &
+                    mg_data(level)%r_dx2,   &
+                    mg_data(level)%x,       &
+                    mg_data(level)%r_x,     &
+                    mg_data(level)%q,       &
+                    mg_data(level)%src,     &
+                    exact,                  &
+                    rms_res, rms_exact)
 
-    write(*,*) vcycle, L_1, L_inf
+    write(*,*) vcycle, rms_res, rms_exact
 
 !----------------------------------------
 ! end of V-cycle
@@ -132,13 +139,16 @@ program multigrid_1d
 
   enddo
 
+  call cpu_time(t2)
+
+  write(*,*) (t2-t1)/n_vcycle
 !--------------------------------------------------
 
-  do i = 1, mg_data(1)%nx
-
-    write(*,*) mg_data(1)%x(i),mg_data(1)%q(i)
-
-  enddo
+!  do i = 1, mg_data(1)%nx
+!
+!    write(*,*) mg_data(1)%x(i),mg_data(1)%q(i)
+!
+!  enddo
 
 !----------------------------------------
 
