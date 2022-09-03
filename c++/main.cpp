@@ -95,7 +95,7 @@ public:
 
     double relax_left_func(std::vector<double> *sol, std::vector<double> *src, double s, double h) override
     {
-        return sol->at(1) - sol->at(0) * h * h / 6.;
+        return sol->at(1) - src->at(0) * h * h / 6.;
     }
 
     double relax_middle_func(std::vector<double> *sol, std::vector<double> *src, double s, double h, int i) override
