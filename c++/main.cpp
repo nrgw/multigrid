@@ -101,7 +101,7 @@ public:
     double relax_middle_func(std::vector<double> *sol, std::vector<double> *src, double s, double h, int i) override
     {
         return (
-                   +sol->at(i + 1) * (1. + h / s) + sol->at(i - 1) * (1. - h / s) - src->at(i) * h * h) /
+                   sol->at(i + 1) * (1. + h / s) + sol->at(i - 1) * (1. - h / s) - src->at(i) * h * h) /
                2.;
     }
 
@@ -129,9 +129,13 @@ public:
 void BVPSolver::bvpsolver_relax()
 {
     sol_val->at(0) = relax_left_func(sol_val, src_val, x->at(0), h);
+
     // Residual at middle points
-    for (int i = 1; i < N; i++)
+    for (int i = 2; i < N; i=i+2)
         sol_val->at(i) = relax_middle_func(sol_val, src_val, x->at(i), h, i);
+    for (int i = 1; i < N; i=i+2)
+        sol_val->at(i) = relax_middle_func(sol_val, src_val, x->at(i), h, i);
+
     // Residual at the rightmost point
     sol_val->at(N) = relax_right_func(sol_val, src_val, x->at(N), h);
 }
@@ -227,6 +231,7 @@ int main()
     for (int i = 0; i < number_of_iter; i++)
     {
         solver.bvpsolver_solve();
+		solver.bvpsolver_get_residual();
         cout << string_format("%d %e %e", i, solver.res_grid->grid_rms(), solver.bvpsolver_exact_error_rms()) << endl;
     }
     system_clock::time_point end = system_clock::now();
