@@ -38,8 +38,8 @@ Grid *Grid::Grid_coarsen()
 {
     Grid *coarser = new Grid(x1, x2, n - 1);
 
-    coarser->val[0] = val[0];
-    for (int i = 0; i < coarser->N; i++)
+    coarser->val[0] = 0.5*(val[0]+val[1]);
+    for (int i = 1; i < coarser->N; i++)
     {
         coarser->val[i] = val[2 * i - 1] / 4. + val[2 * i] / 2. + val[2 * i + 1] / 4.;
     }
