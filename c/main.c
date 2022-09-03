@@ -73,6 +73,7 @@ int main()
     clock_t start = clock();
     for (int i = 0; i < number_of_iter; i++) {
         bvpsolver_solve(solver);
+        bvpsolver_get_residual(solver);
         printf("%d %e %e\n", i, grid_rms(solver->res_grid)*solver->res_grid->h, bvpsolver_exact_error_rms(solver));
     }
     printf("averaged time: %f s\n",(double)(clock() - start)/CLOCKS_PER_SEC/(double)number_of_iter);
