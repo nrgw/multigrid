@@ -4,7 +4,8 @@ c/star
 c/*.o
 c++/star
 **/.vscode
-
+rust/Cargo.lock
+rust/target
 
 ### CMake ###
 CMakeLists.txt.user
