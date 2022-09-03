@@ -4,7 +4,7 @@
 
 double relax_left_func(double *sol, double *src, double s, double h)
 {
-    return sol[1] - sol[0]*h*h/6.;
+    return sol[1] - src[0]*h*h/6.;
 }
 
 double relax_middle_func(double *sol, double *src, double s, double h, int i)
