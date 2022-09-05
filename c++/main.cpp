@@ -235,8 +235,8 @@ int main()
         cout << string_format("%d %e %e", i, solver.res_grid->grid_rms(), solver.bvpsolver_exact_error_rms()) << endl;
     }
     system_clock::time_point end = system_clock::now();
-    seconds m_time = duration_cast<seconds>(end - start);
+    microseconds m_time = duration_cast<microseconds>(end - start);
 
-    cout << string_format("averaged time: %f s", m_time.count() / (double)number_of_iter) << endl;
+    cout << string_format("averaged time: %f s", m_time.count() / (double)number_of_iter / 1000000.0) << endl;
     return 0;
 }
