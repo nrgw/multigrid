@@ -81,7 +81,7 @@ impl Solver {
             problem,
             depth,
             num_iters,
-            qgrid::Grid::new_func(range.clone(), depth, source),
+            grid::Grid::new_func(range.clone(), depth, source),
         )
     }
 
