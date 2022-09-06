@@ -84,26 +84,7 @@ impl Solver {
             grid::Grid::new_func(range.clone(), depth, source),
         )
     }
-
-    fn operate(&self, operation: &Operation) -> Vec<f64> {
-        let h = self.solution.coord.h;
-        let x = &(self.solution.coord.x);
-        let n = self.solution.coord.n;
-        let sol_val = &(self.solution.val);
-        let src_val = &(self.source.val);
-        (0..(n + 1))
-            .map(|i| {
-                if i == 0 {
-                    (operation.left)(sol_val, src_val, x[0], h)
-                } else if i == n {
-                    (operation.right)(sol_val, src_val, x[n], h)
-                } else {
-                    (operation.middle)(sol_val, src_val, x[i], h, i)
-                }
-            })
-            .collect()
-    }
-
+    
     pub fn relax(&mut self) {
         let h = self.solution.coord.h;
         let x = &(self.solution.coord.x);
@@ -111,15 +92,33 @@ impl Solver {
         let sol_val = &mut (self.solution.val);
         let src_val = &(self.source.val);
         let relax = &(self.problem.relax);
+        // red sweep
         sol_val[0] = (relax.left)(sol_val, src_val, x[0], h);
-        for i in 1..n {
-            sol_val[i] = (relax.middle)(sol_val, src_val, x[i], h, i);
+        for i in 1..(n / 2) {
+            let j = 2 * i;
+            sol_val[j] = (relax.middle)(sol_val, src_val, x[j], h, j);
         }
         sol_val[n] = (relax.right)(sol_val, src_val, x[n], h);
+        // black sweep
+        for i in 0..(n / 2) {
+            let j = 2 * i + 1;
+            sol_val[j] = (relax.middle)(sol_val, src_val, x[j], h, j);
+        }
     }
 
     pub fn get_residual(&mut self) {
-        self.residual.val = self.operate(&(self.problem.residual));
+        let h = self.solution.coord.h;
+        let x = &(self.solution.coord.x);
+        let n = self.solution.coord.n;
+        let sol_val = &(self.solution.val);
+        let src_val = &(self.source.val);
+        let res_val = &mut (self.residual.val);
+        let residual = &(self.problem.residual);
+        res_val[0] = (residual.left)(sol_val, src_val, x[0], h);
+        for i in 1..n {
+            res_val[i] = (residual.middle)(sol_val, src_val, x[i], h, i);
+        }
+        res_val[n] = (residual.right)(sol_val, src_val, x[n], h);
     }
 
     pub fn vcycle(&mut self) {

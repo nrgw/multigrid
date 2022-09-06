@@ -61,8 +61,8 @@ fn main() {
         Some(sol),
     );
     let mut solver = bvp::Solver::new(problem, 16, (4, 1, 4));
-    let instant = Instant::now();
     let num_iters = 30;
+    let instant = Instant::now();
     for i in 0..num_iters {
         solver.vcycle();
         println!("{} {:e} {:e}", i, solver.residual_rms(), solver.error_rms());
