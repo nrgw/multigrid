@@ -157,13 +157,15 @@ void bvpsolver_relax(BVPSolver *solver)
     double *sol_val = solver->sol_val;
     double *src_val = solver->src_val;
 
-    // Relaxation at the leftmost point
+    // Red Sweep
     sol_val[0] = solver->bvp->relax_left_func(sol_val, src_val, x[0], h);
-    // Relaxation at middle points
-    for (int i = 1; i < N; i++)
+    for (int i = 2; i < N; i += 2)
         sol_val[i] = solver->bvp->relax_middle_func(sol_val, src_val, x[i], h, i);
-    // Relaxation at the rightmost point
     sol_val[N] = solver->bvp->relax_right_func(sol_val, src_val, x[N], h);
+
+    // Black Sweep
+    for (int i = 1; i < N; i += 2)
+        sol_val[i] = solver->bvp->relax_middle_func(sol_val, src_val, x[i], h, i);
 }
 
 void bvpsolver_get_residual(BVPSolver *solver)
