@@ -62,7 +62,7 @@ fn main() {
     let instant = Instant::now();
     for i in 0..num_iters {
         solver.vcycle();
-        println!("{} {:e} {:e}", i, solver.residual_rms(), solver.error_rms());
+        println!("{} {:e} {:e}", i, solver.residual_rms_normalized(), solver.error_rms());
     }
     println!(
         "averaged time: {}",

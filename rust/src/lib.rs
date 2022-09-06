@@ -168,6 +168,10 @@ impl Solver {
         self.residual.rms()
     }
 
+    pub fn residual_rms_normalized(&mut self) -> f64 {
+        self.residual_rms() * self.solution.coord.h.powi(2)
+    }
+
     pub fn error_rms(&self) -> f64 {
         self.error().rms()
     }
