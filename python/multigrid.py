@@ -85,13 +85,15 @@ class BVPSolver:
         sol_val = self.sol_val
         src_val = self.src_val
 
-        # Relaxation at the leftmost point
+        # Red Sweep
         sol_val[0] = self.bvp.relax_left_func(sol_val, src_val, x[0], h)
-        # Relaxation at middle points
-        for i in range(1, N):
+        for i in range(2, N, 2):
             sol_val[i] = self.bvp.relax_middle_func(sol_val, src_val, x[i], h, i)
-        # Relaxation at the rightmost point
         sol_val[N] = self.bvp.relax_right_func(sol_val, src_val, x[N], h)
+
+        # Black Sweep
+        for i in range(1, N, 2):
+            sol_val[i] = self.bvp.relax_middle_func(sol_val, src_val, x[i], h, i)
 
     def residual(self):
         # Aliases
