@@ -55,5 +55,5 @@ start = time.time()
 for i in range(number_of_iter):
     solver.solve()
     res_rms = solver.residual().rms()
-    print(i, res_rms*solver.sol_grid.h, solver.exact_error().rms())
+    print(i, res_rms*solver.sol_grid.h**2, solver.exact_error().rms())
 print("time : {} s".format((time.time() - start)/number_of_iter))
