@@ -128,16 +128,15 @@ public:
 
 void BVPSolver::bvpsolver_relax()
 {
+    // Red Sweep
     sol_val->at(0) = relax_left_func(sol_val, src_val, x->at(0), h);
-
-    // Residual at middle points
     for (int i = 2; i < N; i=i+2)
         sol_val->at(i) = relax_middle_func(sol_val, src_val, x->at(i), h, i);
+    sol_val->at(N) = relax_right_func(sol_val, src_val, x->at(N), h);
+
+    // Black Sweep
     for (int i = 1; i < N; i=i+2)
         sol_val->at(i) = relax_middle_func(sol_val, src_val, x->at(i), h, i);
-
-    // Residual at the rightmost point
-    sol_val->at(N) = relax_right_func(sol_val, src_val, x->at(N), h);
 }
 void BVPSolver::bvpsolver_get_residual()
 {
@@ -232,7 +231,7 @@ int main()
     {
         solver.bvpsolver_solve();
 		solver.bvpsolver_get_residual();
-        cout << string_format("%d %e %e", i, solver.res_grid->grid_rms(), solver.bvpsolver_exact_error_rms()) << endl;
+        cout << string_format("%d %e %e", i, solver.res_grid->grid_rms()*solver.h*solver.h, solver.bvpsolver_exact_error_rms()) << endl;
     }
     system_clock::time_point end = system_clock::now();
     microseconds m_time = duration_cast<microseconds>(end - start);
