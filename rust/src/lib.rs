@@ -81,10 +81,10 @@ impl Solver {
             problem,
             depth,
             num_iters,
-            grid::Grid::new_func(range.clone(), depth, source),
+            qgrid::Grid::new_func(range.clone(), depth, source),
         )
     }
-    
+
     pub fn relax(&mut self) {
         let h = self.solution.coord.h;
         let x = &(self.solution.coord.x);

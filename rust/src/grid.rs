@@ -43,11 +43,7 @@ pub struct Grid {
 
 impl Grid {
     fn new(depth: u32, coord: Coord, val: Vec<f64>) -> Self {
-        Grid {
-            depth,
-            coord,
-            val,
-        }
+        Grid { depth, coord, val }
     }
 
     fn make_coord(range: Range, depth: u32) -> Coord {
