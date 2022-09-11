@@ -121,7 +121,7 @@ class BVPSolver:
         if self.n != 1:
             # Error Correction using Coarse Grid
             for i in range(self.num_iter[1]):
-                coarse = BVPSolver(self.bvp, self.n - 1, src_grid=self.residual().coarsen(), num_iter=self.num_iter)
+                coarse = type(self)(self.bvp, self.n - 1, src_grid=self.residual().coarsen(), num_iter=self.num_iter)
                 coarse.solve()
                 self.sol_val += coarse.sol_grid.fine().val
 
@@ -138,3 +138,53 @@ class BVPSolver:
         
         exact_error = np.array([self.bvp.exact_sol_func(xi) for xi in self.sol_grid.x]) - self.sol_val
         return Grid(self.bvp.domain, self.n, val=exact_error)
+
+from smart_slice import SmartSlice, cast
+
+class BVPSolver_vec(BVPSolver):
+    """BVPSolver which uses SmartSlice and its associated array. It is meant to
+    reuse the same function that are used with BVPSolver, but with faster
+    execution.
+    """
+
+    def relax(self):
+        # Aliases
+        h = self.h
+        x = self.x
+        N = self.N
+        sol_val = self.sol_val
+        src_val = self.src_val
+
+        # Red Sweep
+        sol_val[0] = self.bvp.relax_left_func(sol_val, src_val, x[0], h)
+        i = SmartSlice(2, N-1, 2)
+        cast(sol_val)[i] = self.bvp.relax_middle_func(
+            cast(sol_val), cast(src_val), cast(x)[i], h, i)
+        sol_val[N] = self.bvp.relax_right_func(sol_val, src_val, x[N], h)
+
+        # Black Sweep
+        i = SmartSlice(1, N, 2)
+        cast(sol_val)[i] = self.bvp.relax_middle_func(
+            cast(sol_val), cast(src_val), cast(x)[i], h, i)
+
+    def residual(self):
+        # Aliases
+        h = self.h
+        x = self.x
+        N = self.N
+        sol_val = self.sol_val
+        src_val = self.src_val
+
+        res = np.zeros(sol_val.shape)
+        # Residual at the leftmost point
+        res[0] = self.bvp.res_left_func(sol_val, src_val, x[0], h)
+        # Residual at middle points
+        i = SmartSlice(1, N, 1)
+
+        # for i in range(1, N):
+        cast(res)[i] = self.bvp.res_middle_func(
+            cast(sol_val), cast(src_val), cast(x)[i], h, i)
+        # Residual at the rightmost point
+        res[N] = self.bvp.res_left_func(sol_val, src_val, x[N], h)
+
+        return Grid(self.bvp.domain, self.n, val=res)

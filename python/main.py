@@ -39,21 +39,38 @@ def exact_sol(s):
     else:
         return -8/15*np.pi*rho_c*r_s**2*(1 - s)/s
 
-from multigrid import BVP, BVPSolver
-
-s1 = 0
-s2 = 1
-bvp = BVP((s1, s2), relax_left, relax_middle, relax_right, residual_left, residual_middle, residual_right, src, exact_sol_func=exact_sol)
-
-n = 16
-solver = BVPSolver(bvp, n, num_iter=(4,1,4))
+from multigrid import BVP, BVPSolver, BVPSolver_vec
 
 import time
 
-number_of_iter = 10
-start = time.time()
-for i in range(number_of_iter):
-    solver.solve()
-    res_rms = solver.residual().rms()
-    print(i, res_rms*solver.sol_grid.h**2, solver.exact_error().rms())
-print("time : {} s".format((time.time() - start)/number_of_iter))
+def run_bpv_solver(BVPSolver=BVPSolver):
+    s1 = 0
+    s2 = 1
+    bvp = BVP((s1, s2),
+              relax_left, relax_middle, relax_right,
+              residual_left, residual_middle, residual_right,
+              src, exact_sol_func=exact_sol)
+
+    n = 16
+    solver = BVPSolver(bvp, n, num_iter=(4,1,4))
+
+    number_of_iter = 10
+    start = time.time()
+    for i in range(number_of_iter):
+        solver.solve()
+        res_rms = solver.residual().rms()
+        print(i, res_rms*solver.sol_grid.h**2, solver.exact_error().rms())
+    print("time : {} s".format((time.time() - start)/number_of_iter))
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--vec', dest='solver', action='store_const',
+                        const=BVPSolver_vec, default=BVPSolver,
+                        help='use vectorized version')
+
+    args = parser.parse_args()
+
+    run_bpv_solver(args.solver)
