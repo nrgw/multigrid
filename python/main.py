@@ -1,3 +1,4 @@
+import time
 import numpy as np
 
 def relax_left(sol, src, s, h):
@@ -39,11 +40,8 @@ def exact_sol(s):
     else:
         return -8/15*np.pi*rho_c*r_s**2*(1 - s)/s
 
-from multigrid import BVP, BVPSolver, BVPSolver_vec
 
-import time
-
-def run_bpv_solver(BVPSolver=BVPSolver):
+def run_bpv_solver(BVPSolver):
     s1 = 0
     s2 = 1
     bvp = BVP((s1, s2),
@@ -55,22 +53,42 @@ def run_bpv_solver(BVPSolver=BVPSolver):
     solver = BVPSolver(bvp, n, num_iter=(4,1,4))
 
     number_of_iter = 10
-    start = time.time()
+    times = []
     for i in range(number_of_iter):
+        start = time.time()
         solver.solve()
         res_rms = solver.residual().rms()
+        times.append(time.time() - start)
         print(i, res_rms*solver.sol_grid.h**2, solver.exact_error().rms())
-    print("time : {} s".format((time.time() - start)/number_of_iter))
+
+    print("time : {} s".format(np.median(times)))
 
 
 if __name__ == '__main__':
     import argparse
 
+    from multigrid import BVP, BVPSolver
+    from multigrid_numpy import BVPSolver_numpy
+    try:
+        import jax
+    except ImportError:
+        print("Importing jax failed. The jax-solver is disabled.")
+        jax = None
+
+    solvers = dict(default=BVPSolver,
+                   numpy=BVPSolver_numpy)
+
+    if jax is not None:
+        from multigrid_jax import BVPSolver_jax
+        solvers["jax"] = BVPSolver_jax
+
     parser = argparse.ArgumentParser()
-    parser.add_argument('--vec', dest='solver', action='store_const',
-                        const=BVPSolver_vec, default=BVPSolver,
-                        help='use vectorized version')
+    parser.add_argument('--solver', nargs=1, help='solver to use',
+                        choices=solvers.keys(), type=str,
+                        dest="solver", default=["default"])
 
     args = parser.parse_args()
 
-    run_bpv_solver(args.solver)
+    solver_name = args.solver[0]
+    solver = solvers[solver_name]
+    run_bpv_solver(solver)
