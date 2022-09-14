@@ -40,14 +40,15 @@ def exact_sol(s):
     else:
         return -8/15*np.pi*rho_c*r_s**2*(1 - s)/s
 
+s1 = 0
+s2 = 1
+bvp = BVP((s1, s2),
+          relax_left, relax_middle, relax_right,
+          residual_left, residual_middle, residual_right,
+          src, exact_sol_func=exact_sol)
 
-def run_bpv_solver(BVPSolver):
-    s1 = 0
-    s2 = 1
-    bvp = BVP((s1, s2),
-              relax_left, relax_middle, relax_right,
-              residual_left, residual_middle, residual_right,
-              src, exact_sol_func=exact_sol)
+
+def run_bpv_solver(bvp, BVPSolver):
 
     n = 16
     solver = BVPSolver(bvp, n, num_iter=(4,1,4))
@@ -67,13 +68,18 @@ def run_bpv_solver(BVPSolver):
 if __name__ == '__main__':
     import argparse
 
-    from multigrid import BVP, BVPSolver
+    from multigrid import BVPSolver
     from multigrid_numpy import BVPSolver_numpy
     try:
         import jax
     except ImportError:
         print("Importing jax failed. The jax-solver is disabled.")
         jax = None
+    try:
+        import numba
+    except ImportError:
+        print("Importing numba failed. The jax-solver is disabled.")
+        numba = None
 
     solvers = dict(default=BVPSolver,
                    numpy=BVPSolver_numpy)
@@ -81,6 +87,10 @@ if __name__ == '__main__':
     if jax is not None:
         from multigrid_jax import BVPSolver_jax
         solvers["jax"] = BVPSolver_jax
+
+    if numba is not None:
+        from multigrid_numba import BVPSolver_numba
+        solvers["numba"] = BVPSolver_numba
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--solver', nargs=1, help='solver to use',
@@ -91,4 +101,5 @@ if __name__ == '__main__':
 
     solver_name = args.solver[0]
     solver = solvers[solver_name]
-    run_bpv_solver(solver)
+
+    run_bpv_solver(bvp, solver)
