@@ -121,7 +121,7 @@ class BVPSolver:
         if self.n != 1:
             # Error Correction using Coarse Grid
             for i in range(self.num_iter[1]):
-                coarse = BVPSolver(self.bvp, self.n - 1, src_grid=self.residual().coarsen(), num_iter=self.num_iter)
+                coarse = type(self)(self.bvp, self.n - 1, src_grid=self.residual().coarsen(), num_iter=self.num_iter)
                 coarse.solve()
                 self.sol_val += coarse.sol_grid.fine().val
 
