@@ -30,7 +30,7 @@ where $r$ is the radius of spherical coordinate, $\Phi\left(r\right)$ is the gra
 
 ### Density Profile and Boundary Condition
 
-We assume the a density profile profile follows a parabolic function in radius as follows:
+We assume a density profile profile follows a parabolic function in radius as follows:
 
 $$
     \rho\left(r\right)=\begin{cases}
@@ -49,7 +49,7 @@ $$
 $$
 
 ### Coordinate Transformation
-To cover the spatial infinity ( $r=\infty$ ) in the computational domain, several special coordinate transformation functions are ommonly use for the coordinate compactification.
+To cover the spatial infinity ( $r=\infty$ ) in the computational domain, several special coordinate transformation functions are commonly used for the coordinate compactification.
 We use the following special function:
 
 $$
