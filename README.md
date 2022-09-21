@@ -92,15 +92,9 @@ $$
 
 And at $s=0$, the above equation can be written as
 $$3\frac{d^2\Phi}{ds^2}=6\frac{\Phi_1-\Phi_0}{h^2}+O\left(h^{2}\right).$$
-Here, we use the L'Hospital's Rule to regularize the term $\frac{2}{s}\frac{d\Phi}{ds}$ at $s=0$ since $\frac{d\Phi}{ds}=0$ at $s=0$, and the reflective boundary condition ( $\Phi_{-1}=\Phi_{1}$ ) is also applied.
+Here, we use the L'Hospital's rule to regularize the term $\frac{2}{s}\frac{d\Phi}{ds}$ at $s=0$ since $\frac{d\Phi}{ds}=0$ at $s=0$, and the reflective boundary condition ( $\Phi_{-1}=\Phi_{1}$ ) is also applied.
 
 ### Relaxation Method
-For $i=N$, we fix
-
-$$
-    \Phi_{N}=0.
-$$
-
 For $i=0$,
 
 $$
@@ -112,5 +106,12 @@ For $i\in\left\\{1,2,\cdots,N-1\right\\}$,
 $$
     \Phi_{i}\leftarrow\frac{1}{2}\left[\left(1+\frac{1}{i}\right)\Phi_{i+1}+\left(1-\frac{1}{i}\right)\Phi_{i-1}-\left(4\pi\rho_{i}\frac{r_{\mathrm{s}}^{2}}{\left(1-s_{i}\right)^{4}}\right)h^{2}\right].
 $$
+
+For $i=N$, we fix
+
+$$
+    \Phi_{N}=0.
+$$
+
 
 ## Multigrid Method
