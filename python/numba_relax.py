@@ -1,10 +1,6 @@
 import numpy as np
 from numba import stencil, njit
 
-@stencil(neighborhood = ((0, 0),))
-def kernel(a, b):
-    return (a[0] + b[1])
-
 @stencil(neighborhood = ((-1, 1),))
 def relax_middle(src, sol, x, h):
     return (
@@ -14,7 +10,7 @@ def relax_middle(src, sol, x, h):
     )/2
 
 # This is for red-black. We assume that src has slice of [i:j:2] while the sol
-# has a slice of [i-1:j:2]. Therefore, original indexing of sol[i-1] becoms
+# has a slice of [i-1:j:2]. Therefore, original indexing of sol[i-1] becomes
 # sol[0] and sol[i+1] becoms sol[1]
 @stencil(neighborhood = ((0, 0),))
 def relax_middle2(src2, sol2m1, x2, h):

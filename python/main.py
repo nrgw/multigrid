@@ -1,5 +1,7 @@
 import time
 import numpy as np
+from multigrid import BVP
+
 
 def relax_left(sol, src, s, h):
     return sol[1] - src[0]*h**2/6

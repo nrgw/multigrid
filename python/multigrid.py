@@ -1,5 +1,6 @@
 from scipy.interpolate import interp1d
 import numpy as np
+from smart_slice import SmartSlice, cast
 
 class Grid:
     def __init__(self, domain, n, val=None, func=None, shape=None):
@@ -39,9 +40,19 @@ class Grid:
         # Full Weighting Restriction
         coarser.val[0] = val[0]
         coarser.val[-1] = val[-1]
-        for i in range(1, coarser.N):
-            coarser.val[i] = 1/4*val[2*i - 1] + 1/2*val[2*i] + 1/4*val[2*i + 1]
+
+        # coarser.val[1:coarser.N] = (1/4*val[1:2*coarser.N - 1:2] +
+        #                             1/2*val[2:2*coarser.N:2] +
+        #                             1/4*val[3:2*coarser.N + 1:2])
+
+        i = SmartSlice(2, 2*coarser.N, 2)
+        val = cast(val)
+        coarser.val[1:coarser.N] = (1/4*val[i-1] +
+                                    1/2*val[i] +
+                                    1/4*val[i+1])
+
         return coarser
+
 
 class BVP:
     def __init__(self, domain, relax_left_func, relax_middle_func, relax_right_func, res_left_func, res_middle_func, res_right_func, src_func, exact_sol_func=None):
