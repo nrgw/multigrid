@@ -3,11 +3,11 @@ use std::f64::consts::PI;
 use std::time::Instant;
 
 fn relax_left(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
-    sol[1] - src[0] * h * h / 6.
+    sol[1] - src[0] * h.powi(2) / 6.
 }
 
 fn relax_middle(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64, i: usize) -> f64 {
-    (0. + sol[i + 1] * (1. + h / s) + sol[i - 1] * (1. - h / s) - src[i] * h * h) / 2.
+    (0. + sol[i + 1] * (1. + h / s) + sol[i - 1] * (1. - h / s) - src[i] * h.powi(2)) / 2.
 }
 
 fn relax_right(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
@@ -15,11 +15,11 @@ fn relax_right(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
 }
 
 fn res_left(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
-    return -(relax_left(sol, src, s, h) - sol[0]) * 6. / (h * h);
+    return -(relax_left(sol, src, s, h) - sol[0]) * 6. / h.powi(2);
 }
 
 fn res_middle(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64, i: usize) -> f64 {
-    return -(relax_middle(sol, src, s, h, i) - sol[i]) * 2. / (h * h);
+    return -(relax_middle(sol, src, s, h, i) - sol[i]) * 2. / h.powi(2);
 }
 
 fn res_right(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {

@@ -74,6 +74,12 @@ impl Grid {
 
     pub fn fine(&self) -> Self {
         let coord = Grid::make_coord(self.coord.range.clone(), self.depth + 1);
+        // let mut val = vec![0.; coord.n + 1];
+        // for i in 0..self.coord.n {
+        //     val[2*i] = self.val[i];
+        //     val[2*i + 1] = self.val[i] / 2. + self.val[i + 1] / 2.;
+        // }
+        // val[coord.n] = self.val[self.coord.n];
         let val = (0..(coord.n + 1))
             .map(|i| {
                 if i % 2 == 0 {
@@ -92,6 +98,12 @@ impl Grid {
             "Coarsening is not possible for depth=0 grid."
         );
         let coord = Grid::make_coord(self.coord.range.clone(), self.depth - 1);
+        // let mut val = vec![0.; coord.n + 1];
+        // val[0] = self.val[0];
+        // for i in 1..coord.n {
+        //     val[i] = self.val[2 * i - 1] / 4. + self.val[2 * i] / 2. + self.val[2 * i + 1] / 4.;
+        // }
+        // val[coord.n] = self.val[self.coord.n];
         let val = (0..(coord.n + 1))
             .map(|i| {
                 if i == 0 {
