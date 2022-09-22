@@ -8,8 +8,10 @@ include("multigrid_functions.jl")
 mg_data = grid()
 mg_data[1] = initialize_finest_grid(mg_data[1])
 
+time_taken = []
 
 for vcycle = 1:n_vcycle
+    elapsed_time = @elapsed begin
 
     for level = 1:max_level-1
 
@@ -46,5 +48,12 @@ for vcycle = 1:n_vcycle
 
     println("$vcycle, $L_1, $L_inf")
 
+
+    end
+    @show elapsed_time
+    push!(time_taken,elapsed_time)
+
 end
 
+
+println("Time average: ",sum(time_taken[2:n_vcycle])/(n_vcycle-1))

@@ -1,5 +1,5 @@
 
-const max_level = 10
+const max_level = 16
 const base_grid = 3
 const pre_relax = 4
 const post_relax = 4
