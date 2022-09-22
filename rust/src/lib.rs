@@ -53,7 +53,6 @@ pub struct Solver {
     problem: Problem,
     solution: grid::Grid,
     source: grid::Grid,
-    residual: grid::Grid,
     num_iters: (u32, u32, u32),
 }
 
@@ -69,7 +68,6 @@ impl Solver {
             problem,
             solution: grid::Grid::new_zeros(range.clone(), depth),
             source,
-            residual: grid::Grid::new_zeros(range.clone(), depth),
             num_iters,
         }
     }
@@ -106,19 +104,22 @@ impl Solver {
         }
     }
 
-    pub fn get_residual(&mut self) {
+    fn residual(&self) -> grid::Grid {
         let h = self.solution.coord.h;
         let x = &(self.solution.coord.x);
         let n = self.solution.coord.n;
         let sol_val = &(self.solution.val);
         let src_val = &(self.source.val);
-        let res_val = &mut (self.residual.val);
         let residual = &(self.problem.residual);
-        res_val[0] = (residual.left)(sol_val, src_val, x[0], h);
+        let mut grid =
+            grid::Grid::new_zeros(self.solution.coord.range.clone(), self.solution.depth);
+        grid.val[0] = (residual.left)(sol_val, src_val, x[0], h);
         for i in 1..n {
-            res_val[i] = (residual.middle)(sol_val, src_val, x[i], h, i);
+            grid.val[i] = (residual.middle)(sol_val, src_val, x[i], h, i);
         }
-        res_val[n] = (residual.right)(sol_val, src_val, x[n], h);
+        grid.val[n] = (residual.right)(sol_val, src_val, x[n], h);
+
+        grid
     }
 
     pub fn vcycle(&mut self) {
@@ -127,12 +128,11 @@ impl Solver {
         }
         if self.solution.depth > 1 {
             for _j in 0..self.num_iters.1 {
-                self.get_residual();
                 let mut solver = Solver::new_with_source(
                     self.problem.clone(),
                     self.solution.depth - 1,
                     self.num_iters,
-                    self.residual.coarsen(),
+                    self.residual().coarsen(),
                 );
                 solver.vcycle();
                 let error = solver.solution.fine();
@@ -140,7 +140,6 @@ impl Solver {
                     self.solution.val[i] += error.val[i];
                 }
             }
-
             for _j in 0..self.num_iters.2 {
                 self.relax();
             }
@@ -163,12 +162,11 @@ impl Solver {
         grid
     }
 
-    pub fn residual_rms(&mut self) -> f64 {
-        self.get_residual();
-        self.residual.rms()
+    pub fn residual_rms(&self) -> f64 {
+        self.residual().rms()
     }
 
-    pub fn residual_rms_normalized(&mut self) -> f64 {
+    pub fn residual_rms_normalized(&self) -> f64 {
         self.residual_rms() * self.solution.coord.h.powi(2)
     }
 

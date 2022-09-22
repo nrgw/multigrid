@@ -42,9 +42,9 @@ fn src(s: &f64) -> f64 {
 fn sol(s: &f64) -> f64 {
     if *s < 0.5 {
         let a = s / (1. - s);
-        return -2. * PI * rho_c * r_s.powi(2) * (1. / 2. - a.powi(2) / 3. + a.powi(4) / 10.);
+        -2. * PI * rho_c * r_s.powi(2) * (1. / 2. - a.powi(2) / 3. + a.powi(4) / 10.)
     } else {
-        return -8. / 15. * PI * rho_c * r_s.powi(2) * (1. - s) / s;
+        -8. / 15. * PI * rho_c * r_s.powi(2) * (1. - s) / s
     }
 }
 
@@ -62,7 +62,12 @@ fn main() {
     let instant = Instant::now();
     for i in 0..num_iters {
         solver.vcycle();
-        println!("{} {:e} {:e}", i, solver.residual_rms_normalized(), solver.error_rms());
+        println!(
+            "{} {:e} {:e}",
+            i,
+            solver.residual_rms_normalized(),
+            solver.error_rms()
+        );
     }
     println!(
         "averaged time: {}",
