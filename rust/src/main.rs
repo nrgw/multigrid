@@ -1,27 +1,27 @@
 use std::f64::consts::PI;
 use std::time::Instant;
 
-fn relax_left(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
+fn relax_left(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64 {
     sol[1] - src[0] * h.powi(2) / 6.
 }
 
-fn relax_middle(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64, i: usize) -> f64 {
+fn relax_middle(sol: &[f64], src: &[f64], s: f64, h: f64, i: usize) -> f64 {
     (0. + sol[i + 1] * (1. + h / s) + sol[i - 1] * (1. - h / s) - src[i] * h.powi(2)) / 2.
 }
 
-fn relax_right(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
+fn relax_right(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64 {
     0.
 }
 
-fn res_left(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
+fn res_left(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64 {
     -(relax_left(sol, src, s, h) - sol[0]) * 6. / h.powi(2)
 }
 
-fn res_middle(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64, i: usize) -> f64 {
+fn res_middle(sol: &[f64], src: &[f64], s: f64, h: f64, i: usize) -> f64 {
     -(relax_middle(sol, src, s, h, i) - sol[i]) * 2. / h.powi(2)
 }
 
-fn res_right(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
+fn res_right(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64 {
     0.
 }
 

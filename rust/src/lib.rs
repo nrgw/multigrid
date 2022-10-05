@@ -2,16 +2,16 @@ mod grid;
 
 #[derive(Clone)]
 pub struct Operation {
-    left: fn(&Vec<f64>, &Vec<f64>, f64, f64) -> f64,
-    middle: fn(&Vec<f64>, &Vec<f64>, f64, f64, usize) -> f64,
-    right: fn(&Vec<f64>, &Vec<f64>, f64, f64) -> f64,
+    left: fn(&[f64], &[f64], f64, f64) -> f64,
+    middle: fn(&[f64], &[f64], f64, f64, usize) -> f64,
+    right: fn(&[f64], &[f64], f64, f64) -> f64,
 }
 
 impl Operation {
     pub fn new(
-        left: fn(&Vec<f64>, &Vec<f64>, f64, f64) -> f64,
-        middle: fn(&Vec<f64>, &Vec<f64>, f64, f64, usize) -> f64,
-        right: fn(&Vec<f64>, &Vec<f64>, f64, f64) -> f64,
+        left: fn(&[f64], &[f64], f64, f64) -> f64,
+        middle: fn(&[f64], &[f64], f64, f64, usize) -> f64,
+        right: fn(&[f64], &[f64], f64, f64) -> f64,
     ) -> Self {
         Operation {
             left,
@@ -111,8 +111,7 @@ impl Solver {
         let sol_val = &(self.solution.val);
         let src_val = &(self.source.val);
         let residual = &(self.problem.residual);
-        let mut grid =
-            grid::Grid::new_zeros(self.solution.coord.range, self.solution.depth);
+        let mut grid = grid::Grid::new_zeros(self.solution.coord.range, self.solution.depth);
         grid.val[0] = (residual.left)(sol_val, src_val, x[0], h);
         for i in 1..n {
             grid.val[i] = (residual.middle)(sol_val, src_val, x[i], h, i);
@@ -151,11 +150,8 @@ impl Solver {
             .problem
             .solution
             .expect("Function for solution in Problem should be provided.");
-        let mut grid = grid::Grid::new_func(
-            self.solution.coord.range,
-            self.solution.depth,
-            solution,
-        );
+        let mut grid =
+            grid::Grid::new_func(self.solution.coord.range, self.solution.depth, solution);
         for i in 0..(self.solution.coord.n + 1) {
             grid.val[i] -= self.solution.val[i];
         }
