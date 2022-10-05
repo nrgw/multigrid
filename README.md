@@ -30,7 +30,7 @@ where $r$ is the radius of spherical coordinate, $\Phi\left(r\right)$ is the gra
 
 ### Density Profile and Boundary Condition
 
-We assume a density profile profile follows a parabolic function in radius as follows:
+We assume a density profile as follows:
 
 $$
     \rho\left(r\right)=\begin{cases}
