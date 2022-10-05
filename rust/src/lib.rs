@@ -49,6 +49,15 @@ impl Problem {
     }
 }
 
+// pub trait FDM {
+//     fn relax_left(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64;
+//     fn relax_middle(sol: &[f64], src: &[f64], s: f64, h: f64, i: usize) -> f64;
+//     fn relax_right(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64;
+//     fn res_left(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64;
+//     fn res_middle(sol: &[f64], src: &[f64], s: f64, h: f64, i: usize) -> f64;
+//     fn res_right(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64;
+// }
+
 pub struct Solver {
     problem: Problem,
     solution: grid::Grid,
@@ -135,7 +144,7 @@ impl Solver {
                 );
                 solver.vcycle();
                 let error = solver.solution.fine();
-                for i in 0..(self.solution.coord.n + 1) {
+                for i in 0..=self.solution.coord.n {
                     self.solution.val[i] += error.val[i];
                 }
             }
@@ -152,7 +161,7 @@ impl Solver {
             .expect("Function for solution in Problem should be provided.");
         let mut grid =
             grid::Grid::new_func(self.solution.coord.range, self.solution.depth, solution);
-        for i in 0..(self.solution.coord.n + 1) {
+        for i in 0..=self.solution.coord.n {
             grid.val[i] -= self.solution.val[i];
         }
         grid

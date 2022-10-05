@@ -25,26 +25,44 @@ fn res_right(sol: &[f64], src: &[f64], s: f64, h: f64) -> f64 {
     0.
 }
 
-const r_s: f64 = 8.;
+const K: f64 = 100.;
+const N: f64 = 1.;
 const rho_c: f64 = 1.28e-3;
+
+trait Sinc {
+    fn sinc(&self) -> f64;
+}
+
+impl Sinc for f64 {
+    fn sinc(&self) -> f64 {
+        if *self == 0. {
+            1.
+        } else {
+            self.sin() / self
+        }
+    }
+}
 
 fn src(s: &f64) -> f64 {
     if *s < 0.5 {
-        let a = 1. - s;
-        let b = s / a;
-        4. * PI * rho_c * (1. - b.powi(2)) * r_s.powi(2) / a.powi(4)
+        let a = ((N + 1.) * K * rho_c.powf(1. / N  - 1.) / (4. * PI)).sqrt();
+        let r_s = PI * a;    
+        let rho = rho_c * (PI * s / (1. - s)).sinc();
+        4. * PI * rho * r_s.powi(2) / (1. - s).powi(4)
     } else {
         0.
     }
 }
 
 fn sol(s: &f64) -> f64 {
-    if *s < 0.5 {
-        let a = s / (1. - s);
-        -2. * PI * rho_c * r_s.powi(2) * (1. / 2. - a.powi(2) / 3. + a.powi(4) / 10.)
+    let a_sq = (N + 1.) * K * rho_c.powf(1. / N  - 1.) / (4. * PI);
+    let factor = if *s < 0.5 {
+        1. + (PI * s / (1. - s)).sinc()
     } else {
-        -8. / 15. * PI * rho_c * r_s.powi(2) * (1. - s) / s
-    }
+        (1. - s) / s
+    };
+
+    -4. * PI * rho_c * a_sq * factor      
 }
 
 fn main() {

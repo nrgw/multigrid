@@ -112,6 +112,9 @@ impl Grid {
         for i in 1..coord.n {
             val[i] = self.val[2 * i - 1] / 4. + self.val[2 * i] / 2. + self.val[2 * i + 1] / 4.;
         }
+        // for (i, item) in val.iter_mut().enumerate().take(coord.n).skip(1) {
+        //     *item = self.val[2 * i - 1] / 4. + self.val[2 * i] / 2. + self.val[2 * i + 1] / 4.;
+        // }
         val[coord.n] = self.val[self.coord.n];
         // let val = (0..(coord.n + 1))
         //     .map(|i| {
