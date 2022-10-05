@@ -34,12 +34,18 @@ We assume a density profile profile follows a parabolic function in radius as fo
 
 $$
     \rho\left(r\right)=\begin{cases}
-        \rho_{\mathrm{c}}\left(1-\frac{r^{2}}{r_{\mathrm{s}}^{2}}\right) &: r< r_{\mathrm{s}}
+        \rho_{\mathrm{c}}\frac{\sin\left(\pi r/r_{\mathrm{s}}\right)}{\pi r/r_{\mathrm{s}}} &: r< r_{\mathrm{s}}
         \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases},
 $$
 
-where $\rho_{\mathrm{c}}$ is the mass density at the center and $r_{\mathrm{s}}$ is the radius of star. We can easily impose two boundary conditions at the center (using symmetry) and infinity (asymptotic behavior of gravitational potential) as
+where $\rho_{\mathrm{c}}$ is the mass density at the center and $r_{\mathrm{s}}$ is the radius of star. Actually the above is the solution of Lane-Emden equation in which $r_{\mathrm{s}}$ is determined by
+
+$$
+    r_{\mathrm{s}}=\pi\sqrt{\frac{N+1}{4\pi}K\rho_{\mathrm{c}}^{\frac{1}{N}-1}},
+$$
+
+where $N=1$ and $K$ is the proportional constant to get the pressure $P=K\rho^{1+1/N}$. We can easily impose two boundary conditions at the center (using symmetry) and infinity (asymptotic behavior of gravitational potential) as
 
 $$
     \begin{cases}
@@ -76,7 +82,7 @@ And the density profile becomes
 
 $$
     \rho\left(r\right)=\begin{cases}
-        \rho_{\mathrm{c}}\left[1-\left(\frac{s}{1-s}\right)^2\right] &: r< r_{\mathrm{s}}
+        \rho_{\mathrm{c}}\frac{\sin\left(\pi s/\left(1-s\right)\right)}{\pi s/\left(1-s\right)} &: r< r_{\mathrm{s}}
         \\\\ 0 &: r\geq r_{\mathrm{s}}
     \end{cases}.
 $$
