@@ -45,7 +45,7 @@ $$
     r_{\mathrm{s}}=\sqrt{\frac{\pi}{2}K},
 $$
 
-where $K$ is the proportional constant to get the pressure $P=K\rho^{2}$. We can easily impose two boundary conditions at the center (using symmetry) and infinity (asymptotic behavior of gravitational potential) as
+where $K$ is the proportional constant in the equation of state $P=K\rho^{2}$. We can easily impose two boundary conditions at the center (using symmetry) and infinity (asymptotic behavior of gravitational potential) as
 
 $$
     \begin{cases}
