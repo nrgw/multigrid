@@ -25,22 +25,25 @@ def residual_middle(sol, src, s, h, i):
 def residual_right(sol, src, s, h):
     return 0
 
-r_s = 8
 rho_c = 1.28e-3
+N = 1
+K = 100
+alpha_sq = (N + 1)*K*rho_c**(1/N  - 1)/(4*np.pi)
+r_s_sq = np.pi**2*alpha_sq
 
 def src(s):
     if s < 0.5:
-        rho = rho_c*(1 - (s / (1 - s))**2)
-        return 4*np.pi*rho*r_s**2*(1 - s)**(-4)
+        rho = rho_c*np.sinc(s/(1 - s))
+        return 4*np.pi*rho*r_s_sq/(1 - s)**4
     else:
         return 0
 
 def exact_sol(s):
     if s < 0.5:
-        a = s/(1 - s)
-        return -2*np.pi*rho_c*r_s**2*(1/2 - a**2/3 + a**4/10)
+        factor = 1 + np.sinc(s/(1 - s))
     else:
-        return -8/15*np.pi*rho_c*r_s**2*(1 - s)/s
+        factor = (1 - s)/s
+    return -4*np.pi*rho_c*alpha_sq*factor
 
 s1 = 0
 s2 = 1
