@@ -1,4 +1,6 @@
-#[derive(Debug, Clone)]
+// use itertools::Itertools;
+
+#[derive(Debug, Clone, Copy)]
 pub struct Range(f64, f64);
 
 impl Range {
@@ -7,8 +9,8 @@ impl Range {
         Range(x1, x2)
     }
 
-    fn tuple(&self) -> (f64, f64) {
-        (self.0, self.1)
+    fn length(&self) -> f64 {
+        self.1 - self.0
     }
 }
 
@@ -23,13 +25,12 @@ pub struct Coord {
 impl Coord {
     fn new(range: Range, n: usize) -> Self {
         assert!(n > 0, "n should be positive value.");
-        let (x1, x2) = range.tuple();
-        let h = (x2 - x1) / (n as f64);
+        let h = range.length() / (n as f64);
         Coord {
             range,
             n,
             h,
-            x: (0..n + 1).map(|i| x1 + h * (i as f64)).collect(),
+            x: (0..=n).map(|i| range.0 + h * (i as f64)).collect(),
         }
     }
 }
@@ -49,10 +50,12 @@ impl Grid {
     fn make_coord(range: Range, depth: u32) -> Coord {
         Coord::new(
             range,
-            2_usize.checked_pow(depth).expect(&format!(
-                "2 to the {} is beyond the upper bound of usize type.",
-                depth
-            )),
+            2_usize.checked_pow(depth).unwrap_or_else(|| {
+                panic!(
+                    "2 to the {} is beyond the upper bound of usize type.",
+                    depth
+                )
+            }),
         )
     }
 
@@ -73,22 +76,28 @@ impl Grid {
     }
 
     pub fn fine(&self) -> Self {
-        let coord = Grid::make_coord(self.coord.range.clone(), self.depth + 1);
-        // let mut val = vec![0.; coord.n + 1];
-        // for i in 0..self.coord.n {
-        //     val[2*i] = self.val[i];
-        //     val[2*i + 1] = self.val[i] / 2. + self.val[i + 1] / 2.;
-        // }
+        let coord = Grid::make_coord(self.coord.range, self.depth + 1);
+        let mut val = vec![0.; coord.n + 1];
+        for i in 0..self.coord.n {
+            val[2 * i] = self.val[i];
+            val[2 * i + 1] = self.val[i] / 2. + self.val[i + 1] / 2.;
+        }
         // val[coord.n] = self.val[self.coord.n];
-        let val = (0..(coord.n + 1))
-            .map(|i| {
-                if i % 2 == 0 {
-                    self.val[i / 2]
-                } else {
-                    self.val[i / 2] / 2. + self.val[i / 2 + 1] / 2.
-                }
-            })
-            .collect();
+        // let val = (0..(coord.n + 1))
+        //     .map(|i| {
+        //         if i % 2 == 0 {
+        //             self.val[i / 2]
+        //         } else {
+        //             self.val[i / 2] / 2. + self.val[i / 2 + 1] / 2.
+        //         }
+        //     })
+        //     .collect();
+
+        // let val = itertools::interleave(
+        //     self.val.iter().step_by(2).copied(),
+        //     self.val.iter().tuples().map(|(a, b)| (a + b) / 2.),
+        // )
+        // .collect();
         Grid::new(self.depth + 1, coord, val)
     }
 
@@ -97,24 +106,24 @@ impl Grid {
             self.depth > 0,
             "Coarsening is not possible for depth=0 grid."
         );
-        let coord = Grid::make_coord(self.coord.range.clone(), self.depth - 1);
-        // let mut val = vec![0.; coord.n + 1];
-        // val[0] = self.val[0];
-        // for i in 1..coord.n {
-        //     val[i] = self.val[2 * i - 1] / 4. + self.val[2 * i] / 2. + self.val[2 * i + 1] / 4.;
-        // }
-        // val[coord.n] = self.val[self.coord.n];
-        let val = (0..(coord.n + 1))
-            .map(|i| {
-                if i == 0 {
-                    self.val[0]
-                } else if i == coord.n {
-                    self.val[self.coord.n]
-                } else {
-                    self.val[2 * i - 1] / 4. + self.val[2 * i] / 2. + self.val[2 * i + 1] / 4.
-                }
-            })
-            .collect();
+        let coord = Grid::make_coord(self.coord.range, self.depth - 1);
+        let mut val = vec![0.; coord.n + 1];
+        val[0] = self.val[0];
+        for i in 1..coord.n {
+            val[i] = self.val[2 * i - 1] / 4. + self.val[2 * i] / 2. + self.val[2 * i + 1] / 4.;
+        }
+        val[coord.n] = self.val[self.coord.n];
+        // let val = (0..(coord.n + 1))
+        //     .map(|i| {
+        //         if i == 0 {
+        //             self.val[0]
+        //         } else if i == coord.n {
+        //             self.val[self.coord.n]
+        //         } else {
+        //             self.val[2 * i - 1] / 4. + self.val[2 * i] / 2. + self.val[2 * i + 1] / 4.
+        //         }
+        //     })
+        //     .collect();
         Grid::new(self.depth - 1, coord, val)
     }
 }

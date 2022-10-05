@@ -63,23 +63,23 @@ impl Solver {
         num_iters: (u32, u32, u32),
         source: grid::Grid,
     ) -> Self {
-        let range = problem.range.clone();
+        let range = problem.range;
         Solver {
             problem,
-            solution: grid::Grid::new_zeros(range.clone(), depth),
+            solution: grid::Grid::new_zeros(range, depth),
             source,
             num_iters,
         }
     }
 
     pub fn new(problem: Problem, depth: u32, num_iters: (u32, u32, u32)) -> Self {
-        let range = problem.range.clone();
+        let range = problem.range;
         let source = problem.source;
         Solver::new_with_source(
             problem,
             depth,
             num_iters,
-            grid::Grid::new_func(range.clone(), depth, source),
+            grid::Grid::new_func(range, depth, source),
         )
     }
 
@@ -112,7 +112,7 @@ impl Solver {
         let src_val = &(self.source.val);
         let residual = &(self.problem.residual);
         let mut grid =
-            grid::Grid::new_zeros(self.solution.coord.range.clone(), self.solution.depth);
+            grid::Grid::new_zeros(self.solution.coord.range, self.solution.depth);
         grid.val[0] = (residual.left)(sol_val, src_val, x[0], h);
         for i in 1..n {
             grid.val[i] = (residual.middle)(sol_val, src_val, x[i], h, i);
@@ -152,7 +152,7 @@ impl Solver {
             .solution
             .expect("Function for solution in Problem should be provided.");
         let mut grid = grid::Grid::new_func(
-            self.solution.coord.range.clone(),
+            self.solution.coord.range,
             self.solution.depth,
             solution,
         );

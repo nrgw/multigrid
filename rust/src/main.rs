@@ -1,4 +1,3 @@
-use bvp;
 use std::f64::consts::PI;
 use std::time::Instant;
 
@@ -15,15 +14,15 @@ fn relax_right(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
 }
 
 fn res_left(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
-    return -(relax_left(sol, src, s, h) - sol[0]) * 6. / h.powi(2);
+    -(relax_left(sol, src, s, h) - sol[0]) * 6. / h.powi(2)
 }
 
 fn res_middle(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64, i: usize) -> f64 {
-    return -(relax_middle(sol, src, s, h, i) - sol[i]) * 2. / h.powi(2);
+    -(relax_middle(sol, src, s, h, i) - sol[i]) * 2. / h.powi(2)
 }
 
 fn res_right(sol: &Vec<f64>, src: &Vec<f64>, s: f64, h: f64) -> f64 {
-    return 0.;
+    0.
 }
 
 const r_s: f64 = 8.;
