@@ -2,22 +2,36 @@
 #include <iostream>
 #include <chrono>
 #include <memory>
+#include <cmath>
 
 using namespace std;
 using namespace chrono;
 
-const double r_s = 8.;
-const double rho_c = 1.28e-3;
 const double PI = 3.14159265358979323846;
+const double rho_c = 1.28e-3;
+const double N = 1.;
+const double K = 100.;
+
+double sinc(double x) {
+    if (x == 0.) {
+        return 1.;
+    } else {
+        return sin(x) / x;
+    }
+}
+
+double alpha_sq() {
+    return (N + 1.) * K * pow(rho_c, 1. / N  - 1.) / (4. * PI);
+}
 
 double src_func(double s)
 {
     if (s < 0.5)
     {
+        double r_s_sq = PI*PI*alpha_sq();
+        double rho = rho_c*sinc(PI * s / (1. - s));
         double a = 1. - s;
-        double b = s / a;
-        double rho = rho_c * (1. - b * b);
-        return 4. * PI * rho * (r_s * r_s) / (a * a * a * a);
+        return 4.*PI*rho*r_s_sq/(a*a*a*a);
     }
     else
     {
@@ -27,15 +41,18 @@ double src_func(double s)
 
 double exact_sol_func(double s)
 {
+    double factor = 0.;
+
     if (s < 0.5)
     {
-        double a = s / (1. - s);
-        return -2. * PI * rho_c * (r_s * r_s) * (1. / 2. - a * a / 3. + a * a * a * a / 10.);
+        factor = 1. + sinc(PI*s/(1. - s));
     }
     else
     {
-        return -8. / 15. * PI * rho_c * (r_s * r_s) * (1. - s) / s;
+        factor = (1. - s)/s;
     }
+
+    return -4.*PI*rho_c*alpha_sq()*factor;
 }
 
 class BVPSolver : public Multigrid
