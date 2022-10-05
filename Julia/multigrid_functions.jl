@@ -73,7 +73,7 @@ end
 
 ###
 
-function restriction(n_coarse,n_fine,q_fine)
+function restriction(n_coarse::Int64,n_fine::Int64,q_fine::Vector{Float64})
     #q_coarse[n_coarse] = 0
     q_coarse = zeros(n_coarse)
 
@@ -89,7 +89,7 @@ end
 
 ###
 
-function prolongation(n_coarse,n_fine,q_coarse)
+function prolongation(n_coarse::Int64,n_fine::Int64,q_coarse::Vector{Float64})
     q_fine = zeros(n_fine)
 
     for i = 1:n_coarse
@@ -102,4 +102,30 @@ function prolongation(n_coarse,n_fine,q_coarse)
     end
 
     return q_fine
+end
+
+
+
+###
+
+function rms_error(u :: mg_data_type)
+    rms_exact = 0.
+
+    i = 1
+    temp1 = u.src[i]-6*(u.q[i+1]-u.q[i])*u.r_dx2 
+    rms_res = temp1^2 
+
+    for i = 2:u.nx-1
+        temp1 = (u.src[i]-(u.q[i+1]-2*u.q[i]+u.q[i-1])*u.r_dx2-u.r_x[i]*(u.q[i+1]-u.q[i-1])*u.r_dx)
+        rms_res = rms_res + temp1^2
+    end 
+
+    for i = 1:u.nx 
+        rms_exact = rms_exact + (u.q[i]-u.exact[i])^2
+    end 
+
+    temp2 = 1. /u.nx
+    rms_res = sqrt(rms_res*temp2)
+    rms_exact = sqrt(rms_exact*temp2)
+    return rms_res, rms_exact 
 end
