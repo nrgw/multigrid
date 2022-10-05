@@ -146,7 +146,7 @@ program multigrid_1d
 
 !  do i = 1, mg_data(1)%nx
 !
-!    write(*,*) mg_data(1)%x(i),mg_data(1)%q(i)
+!    write(*,*) mg_data(1)%x(i),mg_data(1)%q(i),exact(i)
 !
 !  enddo
 

@@ -8,11 +8,14 @@ module multigrid_parameters
                         pre_relax = 4, post_relax = 4,    &
                         n_vcycle = 20
 
-  double precision, parameter :: xmin = 0.d0, xmax = 1.d0,    &
-                                 pi = 4.d0*atan(1.d0),        &
-                                 pi2 = pi**2,                 &
-                                 rho_c = 1.28d-3,             &
-                                 r_s = 8.d0
+  double precision, parameter :: xmin = 0.d0, xmax = 1.d0,      &
+                                 pi = 4.d0*atan(1.d0),          &
+                                 pi2 = pi**2,                   &
+                                 rho_c = 1.28d-3,               &
+                                 N = 1.d0, K = 1.d2,            &
+                                 alpha2 = (N+1.d0)*K/(4.d0*pi), &
+                                 alpha = sqrt(alpha2),          &
+                                 r_s = pi*alpha
 
 !------------------------------------------------------------
 
@@ -221,17 +224,20 @@ module multigrid_data
 
     enddo
 
-    do i = 1, n-1
+    i = 1
+    u%src(i) = 4.d0*pi*rho_c*rs2
+    exact(i) = -8.d0*pi*rho_c*alpha2
+    do i = 2, n-1
 
       x = u%x(i)
       r_x = u%r_x(i)
       temp = x/(1.d0-x)
       if (x > 5.d-1) then
         u%src(i) = 0.d0
-        exact(i) = -8.d0/15.d0*pi*rho_c*rs2*(r_x-1.d0)
+        exact(i) = -4.d0*pi*alpha2*rho_c/temp
       else
-        u%src(i) = 4.d0*pi*rho_c*rs2*(1.d0-(x/(1.d0-x))**2)/(1.d0-x)**4
-        exact(i) = -2.d0*pi*rho_c*rs2*(5.d-1-temp**2/3.d0+1.d-1*temp**4)
+        u%src(i) = 4.d0*pi*rho_c*rs2*(sin(pi*temp)/(pi*temp))/(1.d0-x)**4
+        exact(i) = -4.d0*pi*rho_c*alpha2*(1.d0+sin(pi*temp)/(pi*temp))
       endif
 
     enddo
