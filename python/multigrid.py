@@ -3,6 +3,16 @@ import numpy as np
 from smart_slice import SmartSlice, cast
 
 class Grid:
+    SHAREDMEM = {}
+    DOMAINX = {}
+
+    @classmethod
+    def preallocate_memory(cls, n, domain):
+        x1, x2 = domain
+        for m in range(1, n+1):
+            cls.SHAREDMEM[(2**m+1,)] = [np.zeros((2**m+1,)) for i in range(3)]
+            cls.DOMAINX[(domain, 2**m+1)] = np.linspace(x1, x2, 2**m+1)
+
     def __init__(self, domain, n, val=None, func=None, shape=None):
         self.domain = domain
         self.n = n
@@ -12,8 +22,10 @@ class Grid:
         x2 = domain[1]
 
         self.N = N
-        self.x = np.linspace(x1, x2, num=N+1)
+        self.x = self.DOMAINX[(domain, N+1)]
+
         self.h = (x2 - x1)/N
+        self._memory_borrowed = False
         
         if val is not None:
             if val.shape[0] != N + 1:
@@ -22,10 +34,16 @@ class Grid:
         elif func is not None:
             self.val = np.array([func(xi) for xi in self.x])
         elif shape is not None:
-            self.val = np.zeros((self.N + 1,) + shape)
+            self.val = self.SHAREDMEM[(self.N + 1,) + shape].pop()
+            self.val.fill(0)
+            self._memory_borrowed = True
         else:
             raise Exception('One of val, func, and shape should be specified.')
             
+    def __del__(self):
+        if self._memory_borrowed:
+            self.SHAREDMEM[self.val.shape].append(self.val)
+
     def rms(self):
         return np.linalg.norm(self.val, ord=2, axis=0)/np.sqrt(self.val.shape[0])
 

@@ -1,6 +1,6 @@
 import time
 import numpy as np
-from multigrid import BVP
+from multigrid import BVP, Grid
 
 
 def relax_left(sol, src, s, h):
@@ -56,6 +56,7 @@ bvp = BVP((s1, s2),
 def run_bpv_solver(bvp, BVPSolver, depth=16, niter=10):
 
     n = depth
+    Grid.preallocate_memory(n, bvp.domain)
     solver = BVPSolver(bvp, n, num_iter=(4,1,4))
 
     number_of_iter = niter
