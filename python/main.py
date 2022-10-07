@@ -53,12 +53,12 @@ bvp = BVP((s1, s2),
           src, exact_sol_func=exact_sol)
 
 
-def run_bpv_solver(bvp, BVPSolver):
+def run_bpv_solver(bvp, BVPSolver, depth=16, niter=10):
 
-    n = 16
+    n = depth
     solver = BVPSolver(bvp, n, num_iter=(4,1,4))
 
-    number_of_iter = 10
+    number_of_iter = niter
     times = []
     for i in range(number_of_iter):
         start = time.time()
@@ -102,9 +102,18 @@ if __name__ == '__main__':
                         choices=solvers.keys(), type=str,
                         dest="solver", default=["default"])
 
+    parser.add_argument('--depth', help='depth of grid',
+                        type=int,
+                        dest="depth", default=16)
+
+    parser.add_argument('--niter', help='nubner of iter',
+                        type=int,
+                        dest="niter", default=10)
+
     args = parser.parse_args()
 
     solver_name = args.solver[0]
     solver = solvers[solver_name]
 
-    run_bpv_solver(bvp, solver)
+    print(f"solver:{solver_name}, depth={args.depth}, niter={args.niter}")
+    run_bpv_solver(bvp, solver, depth=args.depth, niter=args.niter)
