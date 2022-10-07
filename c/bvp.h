@@ -1,21 +1,7 @@
-typedef struct {
-    double x1;
-    double x2;
-    int n;
-    int N;
-    double h;
-    double *x;
-    double *val;
-} Grid;
+#ifndef BVP_H
+#define BVP_H
 
-Grid *grid_new(double x1, double x2, int n);
-Grid *grid_new_zeros(double x1, double x2, int n);
-Grid *grid_new_func(double x1, double x2, int n, double (*func)(double));
-void grid_delete(Grid *grid);
-void grid_set_zero(Grid *grid);
-double grid_rms(Grid *grid);
-void grid_fine(Grid *grid, Grid *target);
-void grid_coarsen(Grid *grid, Grid *target);
+#include "grid.h"
 
 typedef struct {
     double x1;
@@ -61,3 +47,5 @@ void bvpsolver_solve(BVPSolver *solver);
 double bvpsolver_residual_rms(BVPSolver *solver);
 double bvpsolver_residual_rms_normalized(BVPSolver *solver);
 double bvpsolver_error_rms(BVPSolver *solver, Grid *solution);
+
+#endif

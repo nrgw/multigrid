@@ -1,4 +1,4 @@
-#include "multigrid.h"
+#include "bvp.h"
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
@@ -78,17 +78,19 @@ double exact_sol_func(double s)
     return -4.*PI*rho_c*alpha_sq()*factor;
 }
 
-int main()
+int main(int argc, char *argv[])
 {
     double s1 = 0.;
     double s2 = 1.;
     BVP *bvp = bvp_new(s1, s2, relax_left_func, relax_middle_func, relax_right_func, res_left_func, res_middle_func, res_right_func, src_func, exact_sol_func);
 
-    int n = 16;
+    int n;
+    sscanf(argv[1], "%d", &n);
+
     BVPSolver *solver = bvpsolver_new(bvp, n, 4, 1, 4);
     Grid *exact_sol_grid = grid_new_func(s1, s2, n, exact_sol_func);
 
-    const int number_of_iter = 30;
+    int number_of_iter = 1 << (23 - n);
     clock_t start = clock();
     for (int i = 0; i < number_of_iter; i++) {
         bvpsolver_solve(solver);
