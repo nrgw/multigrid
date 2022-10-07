@@ -84,13 +84,15 @@ int main(int argc, char *argv[])
     double s2 = 1.;
     BVP *bvp = bvp_new(s1, s2, relax_left_func, relax_middle_func, relax_right_func, res_left_func, res_middle_func, res_right_func, src_func, exact_sol_func);
 
-    int n;
+    int n, m;
     sscanf(argv[1], "%d", &n);
+    sscanf(argv[2], "%d", &m);
 
     BVPSolver *solver = bvpsolver_new(bvp, n, 4, 1, 4);
-    Grid *exact_sol_grid = grid_new_func(s1, s2, n, exact_sol_func);
-
-    int number_of_iter = 1 << (23 - n);
+    Grid *exact_sol_grid = grid_new(s1, s2, n, 1);
+    grid_set_func(exact_sol_grid, 0, exact_sol_func);
+    
+    int number_of_iter = 1 << (m - n);
     clock_t start = clock();
     for (int i = 0; i < number_of_iter; i++) {
         bvpsolver_solve(solver);

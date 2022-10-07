@@ -27,15 +27,14 @@ BVP *bvp_new(
     double (*src_func)(double),
     double (*exact_sol_func)(double)
 );
-
 void bvp_delete(BVP *bvp);
 
-typedef enum _GridKind {SRC, SOL, RES, ERR, NUM_GK} GridKind;
 
 typedef struct {
     BVP *bvp;
-    int n;
-    Grid **grid[NUM_GK];
+    int num_level;
+    Grid *grid;
+    Grid **subgrid;
     int num_iter1;
     int num_iter2;
     int num_iter3;
