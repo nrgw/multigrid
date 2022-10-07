@@ -32,15 +32,13 @@ void bvp_delete(BVP *bvp);
 
 typedef struct {
     BVP *bvp;
-    int num_level;
-    Grid *grid;
-    Grid **subgrid;
-    int num_iter1;
-    int num_iter2;
-    int num_iter3;
+    int num_levels;
+    Grid *top_grid;
+    Grid **grid;
+    int num_iters[3];
 } BVPSolver;
 
-BVPSolver *bvpsolver_new(BVP *bvp, int num_level, int num_iter1, int num_iter2, int num_iter3);
+BVPSolver *bvpsolver_new(BVP *bvp, int num_levels, int num_iters_1, int num_iters_2, int num_iters_3);
 void bvpsolver_delete(BVPSolver *solver);
 void bvpsolver_solve(BVPSolver *solver);
 double bvpsolver_residual_rms(BVPSolver *solver);

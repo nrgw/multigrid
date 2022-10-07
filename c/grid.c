@@ -47,38 +47,27 @@ void grid_set_func(Grid *grid, int index, double (*func)(double))
     }
 }
 
-#define SQ(x) ((x)*(x))
-
-double grid_rms(Grid *grid, int index)
-{
-    double sum = 0.;
-    for (int i = 0; i <= grid->N; i++) {
-        sum += SQ(grid->var[index][i]);
-    }
-    return sqrt(sum/(double)(1 + grid->N));
-}
-
-void grid_fine(Grid *grid, int index, Grid *target, int target_index)
+void grid_set_from_coarser(Grid *grid, int index, Grid *coarser, int coarser_index)
 {
     // Linear Interpolation
-    for (int i = 0; i <= target->N; i++) {
+    for (int i = 0; i <= grid->N; i++) {
         if (i % 2 == 0) {
-            target->var[target_index][i] = grid->var[index][i/2];
+            grid->var[index][i] = coarser->var[coarser_index][i/2];
         } else {
-            target->var[target_index][i] = grid->var[index][i/2]/2. + grid->var[index][i/2 + 1]/2.;
+            grid->var[index][i] = coarser->var[coarser_index][i/2]/2. + coarser->var[coarser_index][i/2 + 1]/2.;
         }
     }
 }
 
-void grid_coarsen(Grid *grid, int index, Grid *target, int target_index)
+void grid_set_from_finer(Grid *grid, int index, Grid *finer, int finer_index)
 {
     // Full Weighting Restriction
-    target->var[target_index][0] = grid->var[index][0];
-    for (int i = 1; i < target->N; i++) {
-        target->var[target_index][i] = grid->var[index][2*i - 1]/4. + grid->var[index][2*i]/2. + grid->var[index][2*i + 1]/4.;
+    grid->var[index][0] = finer->var[finer_index][0];
+    for (int i = 1; i < grid->N; i++) {
+        grid->var[index][i] = finer->var[finer_index][2*i - 1]/4. + finer->var[finer_index][2*i]/2. + finer->var[finer_index][2*i + 1]/4.;
     
     }
-    target->var[target_index][target->N] = grid->var[index][grid->N];
+    grid->var[index][grid->N] = finer->var[finer_index][finer->N];
 }
 
 void grid_add(Grid *grid, int index, Grid *from, int from_index)
@@ -93,4 +82,15 @@ void grid_subtract(Grid *grid, int index, Grid *a, int a_index, Grid *b, int b_i
     for (int i = 0; i <= grid->N; i++) {
         grid->var[index][i] = a->var[a_index][i] - b->var[b_index][i];
     }
+}
+
+#define SQ(x) ((x)*(x))
+
+double grid_get_rms(Grid *grid, int index)
+{
+    double sum = 0.;
+    for (int i = 0; i <= grid->N; i++) {
+        sum += SQ(grid->var[index][i]);
+    }
+    return sqrt(sum/(double)(1 + grid->N));
 }
