@@ -5,10 +5,15 @@ const pre_relax = 4
 const post_relax = 4
 const n_vcycle = 20
 
-xmin = 0.
-xmax = 1.
-ρ_c = 1.28e-3
-r_s = 8.
+const xmin = 0.
+const xmax = 1.
+const ρ_c = 1.28e-3
+const N = 1.
+const K = 1.e2
+const alpha2 = (N+1)*K/(4π)
+const alpha = sqrt(alpha2)
+const r_s = π*alpha
+
 
 
 ###
@@ -25,6 +30,7 @@ mutable struct mg_data_type
     src :: Vector{Float64}
     res :: Vector{Float64}
     err :: Vector{Float64}
+    exact :: Vector{Float64}
 end
 
 
@@ -55,8 +61,9 @@ function allocate_data(level :: Int64)
     src = zeros(n)
     res = zeros(n)
     err = zeros(n)
+    exact = zeros(n)
 
-    return mg_data_type(nx,dx,dx2,r_dx,r_dx2,x,r_x,q,src,res,err)
+    return mg_data_type(nx,dx,dx2,r_dx,r_dx2,x,r_x,q,src,res,err,exact)
 end
 
 
@@ -75,21 +82,29 @@ end
 
 ###
 
-function initialize_finest_grid(u1)
+function initialize_finest_grid(u1::mg_data_type)
 
     n = u1.nx
     rs2 = r_s^2
 
     for i = 1:n
         u1.q[i] = 0.
+        u1.exact[i] = 0.
     end
 
-    for i = 1:n-1
+    i = 1
+    u1.src[i] = 4π*ρ_c*rs2
+    u1.exact[i] = -8π*ρ_c*alpha2 
+    for i = 2:n-1
         x = u1.x[i]
-        if x > 0.5
-            u1.src[i] = 0.
-        else
-            u1.src[i] = 4π*ρ_c*rs2*(1-(x/(1-x))^2)/(1-x)^4
+        r_x = u1.r_x[i]
+        temp = x/(1-x)
+        if x > 0.5 
+            u1.src[i] = 0. 
+            u1.exact[i] = -4π*alpha2*ρ_c/temp 
+        else 
+            u1.src[i] = 4π*ρ_c*rs2*(sin(π*temp)/(π*temp))/(1-x)^4
+            u1.exact[i] = -4π*ρ_c*alpha2*(1+sin(pi*temp)/(pi*temp))
         end
     end
 

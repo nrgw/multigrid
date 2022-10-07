@@ -1,5 +1,3 @@
-using DelimitedFiles
-
 
 include("multigrid_data.jl")
 include("multigrid_functions.jl")
@@ -44,9 +42,10 @@ for vcycle = 1:n_vcycle
 
     level = 1
 
-    L_1, L_inf = residual_norm(mg_data[level])
-
-    println("$vcycle, $L_1, $L_inf")
+    #L_1, L_inf = residual_norm(mg_data[level])
+    #println("$vcycle, $L_1, $L_inf")
+    rms_res, rms_exact = rms_error(mg_data[level])
+    println("$vcycle, $rms_res, $rms_exact")
 
 
     end
