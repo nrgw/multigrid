@@ -102,7 +102,12 @@ public:
         src_val = &(src_grid->val);
         res_val = &(res_grid->val);
     }
-    ~BVPSolver(){};
+    ~BVPSolver()
+    {
+        delete sol_grid;
+        delete src_grid;
+        delete res_grid;
+    }
     void bvpsolver_relax();
     void bvpsolver_get_residual();
     void bvpsolver_multigrid();
