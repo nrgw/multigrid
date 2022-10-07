@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         bvpsolver_solve(solver);
         printf("%d %e %e\n", i, bvpsolver_residual_rms_normalized(solver), bvpsolver_error_rms(solver, exact_sol_grid));
     }
-    printf("averaged time: %f s\n",(double)(clock() - start)/CLOCKS_PER_SEC/(double)number_of_iter);
+    fprintf(stderr, "averaged time: %f s\n",(double)(clock() - start)/CLOCKS_PER_SEC/(double)number_of_iter);
 
     grid_delete(exact_sol_grid);
     bvpsolver_delete(solver);
