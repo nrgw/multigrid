@@ -11,7 +11,7 @@ Grid *grid_new(double x1, double x2, int n)
     grid->x2 = x2;
     grid->n = n;
     int N = 1<<n;
-    grid->N = N;    
+    grid->N = N;
     double h = (x2 - x1)/(double)N;
     grid->h = h;
     grid->x = (double*)malloc(sizeof(double)*(N + 1));
@@ -25,7 +25,7 @@ Grid *grid_new(double x1, double x2, int n)
 Grid *grid_new_zeros(double x1, double x2, int n)
 {
     Grid *grid = grid_new(x1, x2, n);
-    memset(grid->val, 0, sizeof(double)*(grid->N + 1));
+    grid_set_zero(grid);
     return grid;
 }
 
@@ -45,6 +45,11 @@ void grid_delete(Grid *grid)
     free(grid);
 }
 
+void grid_set_zero(Grid *grid)
+{
+    memset(grid->val, 0, sizeof(double)*(grid->N + 1));
+}
+
 double grid_rms(Grid *grid)
 {
     double sum = 0.;
@@ -54,31 +59,34 @@ double grid_rms(Grid *grid)
     return sqrt(sum/(double)(1 + grid->N));
 }
 
-Grid *grid_fine(Grid *grid)
+void grid_fine(Grid *grid, Grid *target)
 {
-    Grid *finer = grid_new(grid->x1, grid->x2, grid->n + 1);
     // Linear Interpolation
-    for (int i = 0; i <= finer->N; i++) {
+    for (int i = 0; i <= target->N; i++) {
         if (i % 2 == 0) {
-            finer->val[i] = grid->val[i/2];
+            target->val[i] = grid->val[i/2];
         } else {
-            finer->val[i] = grid->val[i/2]/2. + grid->val[i/2 + 1]/2.;
+            target->val[i] = grid->val[i/2]/2. + grid->val[i/2 + 1]/2.;
         }
     }
-    return finer;
 }
 
-Grid *grid_coarsen(Grid *grid)
+void grid_coarsen(Grid *grid, Grid *target)
 {
-    Grid *coarser = grid_new(grid->x1, grid->x2, grid->n - 1);
     // Full Weighting Restriction
-    coarser->val[0] = grid->val[0];
-    for (int i = 1; i < coarser->N; i++) {
-        coarser->val[i] = grid->val[2*i - 1]/4. + grid->val[2*i]/2. + grid->val[2*i + 1]/4.;
+    target->val[0] = grid->val[0];
+    for (int i = 1; i < target->N; i++) {
+        target->val[i] = grid->val[2*i - 1]/4. + grid->val[2*i]/2. + grid->val[2*i + 1]/4.;
     
     }
-    coarser->val[coarser->N] = grid->val[grid->N];
-    return coarser;
+    target->val[target->N] = grid->val[grid->N];
+}
+
+void grid_subtract(Grid *a, Grid *b, Grid *target)
+{
+    for (int i = 0; i <= target->N; i++) {
+        target->val[i] = a->val[i] - b->val[i];
+    }
 }
 
 BVP *bvp_new(
@@ -112,50 +120,57 @@ void bvp_delete(BVP *bvp)
     free(bvp);
 }
 
-BVPSolver *bvpsolver_new(BVP *bvp, int n, Grid *src_grid, int num_iter1, int num_iter2, int num_iter3)
+BVPSolver *bvpsolver_new(BVP *bvp, int num_level, int num_iter1, int num_iter2, int num_iter3)
 {
     BVPSolver *solver = (BVPSolver*)malloc(sizeof(BVPSolver));
     solver->bvp = bvp;
-    solver->n = n;
-    solver->sol_grid = grid_new_zeros(bvp->x1, bvp->x2, n);
-    if (src_grid == NULL) {
-        solver->src_grid = grid_new_func(bvp->x1, bvp->x2, n, bvp->src_func);
-    } else {
-        solver->src_grid = src_grid;
+    solver->n = num_level;
+
+    for (GridKind i = 0; i < NUM_GK; i++) {
+        solver->grid[i] = (Grid**)malloc(sizeof(Grid*)*num_level);
+        for (int j = 0; j < num_level - 1; j++) {
+            solver->grid[i][j] = grid_new(bvp->x1, bvp->x2, j + 1);
+        }
+        switch (i) {
+            case SRC:
+                solver->grid[i][num_level - 1] = grid_new_func(bvp->x1, bvp->x2, num_level, bvp->src_func);
+                break;
+            case SOL:
+                solver->grid[i][num_level - 1] = grid_new_zeros(bvp->x1, bvp->x2, num_level);
+                break;
+            case RES:
+            case ERR:
+                solver->grid[i][num_level - 1] = grid_new(bvp->x1, bvp->x2, num_level);
+                break;
+        }
     }
-    solver->res_grid = grid_new(bvp->x1, bvp->x2, n);
-    
+
     solver->num_iter1 = num_iter1;
     solver->num_iter2 = num_iter2;
     solver->num_iter3 = num_iter3;
-
-    // Aliases
-    solver->h = solver->sol_grid->h;
-    solver->x = solver->sol_grid->x;
-    solver->N = solver->sol_grid->N;
-    solver->sol_val = solver->sol_grid->val;
-    solver->src_val = solver->src_grid->val;
-    solver->res_val = solver->res_grid->val;
 
     return solver;
 }
 
 void bvpsolver_delete(BVPSolver *solver)
 {
-    grid_delete(solver->src_grid);
-    grid_delete(solver->sol_grid);
-    grid_delete(solver->res_grid);
+    for (GridKind i = 0; i < NUM_GK; i++) {
+        for (int j = 0; j < solver->n; j++) {
+            grid_delete(solver->grid[i][j]);
+        }
+        free(solver->grid[i]);
+    }
     free(solver);
 }
 
-void bvpsolver_relax(BVPSolver *solver)
+void bvpsolver_relax(BVPSolver *solver, int level)
 {
     // Aliases
-    double h = solver->h;
-    double *x = solver->x;
-    int N = solver->N;
-    double *sol_val = solver->sol_val;
-    double *src_val = solver->src_val;
+    double h = solver->grid[0][level]->h;
+    double *x = solver->grid[0][level]->x;
+    int N = solver->grid[0][level]->N;
+    double *src_val = solver->grid[SRC][level]->val;
+    double *sol_val = solver->grid[SOL][level]->val;
 
     // Red Sweep
     sol_val[0] = solver->bvp->relax_left_func(sol_val, src_val, x[0], h);
@@ -168,16 +183,15 @@ void bvpsolver_relax(BVPSolver *solver)
         sol_val[i] = solver->bvp->relax_middle_func(sol_val, src_val, x[i], h, i);
 }
 
-void bvpsolver_get_residual(BVPSolver *solver)
+void bvpsolver_get_residual(BVPSolver *solver, int level)
 {
     // Aliases
-    double h = solver->h;
-    double *x = solver->x;
-    int N = solver->N;
-    double *sol_val = solver->sol_val;
-    double *src_val = solver->src_val;
-    double *res_val = solver->res_val;
-
+    double h = solver->grid[0][level]->h;
+    double *x = solver->grid[0][level]->x;
+    int N = solver->grid[0][level]->N;
+    double *src_val = solver->grid[SRC][level]->val;
+    double *sol_val = solver->grid[SOL][level]->val;
+    double *res_val = solver->grid[RES][level]->val;
 
     // Residual at the leftmost point
     res_val[0] = solver->bvp->res_left_func(sol_val, src_val, x[0], h);
@@ -188,55 +202,57 @@ void bvpsolver_get_residual(BVPSolver *solver)
     res_val[N] = solver->bvp->res_left_func(sol_val, src_val, x[N], h);
 }
 
-void bvpsolver_multigrid(BVPSolver *solver)
+
+void bvpsolver_multigrid(BVPSolver *solver, int level)
 {
     // Pre-Smoothing
     for (int j = 0; j < solver->num_iter1; j++)
-        bvpsolver_relax(solver);
-    if (solver->n != 1) {
+        bvpsolver_relax(solver, level);
+    if (level > 0) {
         // Error Correction using Coarse Grid
         for (int j = 0; j < solver->num_iter2; j++) {
-            bvpsolver_get_residual(solver);
-            BVPSolver *coarse_solver = bvpsolver_new(solver->bvp, solver->n - 1, grid_coarsen(solver->res_grid), solver->num_iter1, solver->num_iter2, solver->num_iter3);
-            bvpsolver_solve(coarse_solver);
-            Grid *error_grid = grid_fine(coarse_solver->sol_grid);
-            for (int i = 0; i <= solver->N; i++) {
-                solver->sol_val[i] += error_grid->val[i];
+            bvpsolver_get_residual(solver, level);
+            grid_coarsen(solver->grid[RES][level], solver->grid[SRC][level - 1]);
+            grid_set_zero(solver->grid[SOL][level - 1]);
+            bvpsolver_multigrid(solver, level - 1);
+            grid_fine(solver->grid[SOL][level - 1], solver->grid[ERR][level]);
+            for (int i = 0; i <= solver->grid[SOL][level]->N; i++) {
+                solver->grid[SOL][level]->val[i] += solver->grid[ERR][level]->val[i];
             }
-            grid_delete(error_grid);
-            bvpsolver_delete(coarse_solver);
         }
 
         // Post-Smoothing
         for (int j = 0; j < solver->num_iter3; j++)
-            bvpsolver_relax(solver);
+            bvpsolver_relax(solver, level);
     }
 }
+
+void bvpsolver_get_error(BVPSolver *solver, Grid *solution)
+{
+    grid_subtract(solution, solver->grid[SOL][solver->n - 1], solver->grid[ERR][solver->n - 1]);
+}
+
+// public functions
 
 void bvpsolver_solve(BVPSolver *solver)
 {
-    bvpsolver_multigrid(solver);
+    bvpsolver_multigrid(solver, solver->n - 1);
 }
 
-Grid *bvpsolver_exact_error(BVPSolver *solver)
+double bvpsolver_residual_rms(BVPSolver *solver)
 {
-    if (solver->bvp->exact_sol_func == NULL) {
-        fprintf(stderr, "exact_sol_func is not specified.\n");
-        exit(1);
-    }
-
-    Grid *error_grid = grid_new_func(solver->bvp->x1, solver->bvp->x2, solver->n, solver->bvp->exact_sol_func);
-    for (int i = 0; i <= solver->N; i++) {
-        error_grid->val[i] -= solver->sol_val[i];
-    }
-
-    return error_grid;
+    bvpsolver_get_residual(solver, solver->n - 1);
+    return grid_rms(solver->grid[RES][solver->n - 1]);
 }
 
-double bvpsolver_exact_error_rms(BVPSolver *solver)
+double bvpsolver_residual_rms_normalized(BVPSolver *solver)
 {
-    Grid *error_grid = bvpsolver_exact_error(solver);
-    double error_rms = grid_rms(error_grid);
-    grid_delete(error_grid);
-    return error_rms;
+    double h = solver->grid[SOL][solver->n - 1]->h;
+    return bvpsolver_residual_rms(solver)*h*h;
+}
+
+double bvpsolver_error_rms(BVPSolver *solver, Grid *solution)
+{
+    bvpsolver_get_error(solver, solution);
+    return grid_rms(solver->grid[ERR][solver->n - 1]);
 }

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-O3
+CFLAGS=-O3 -flto
 LDFLAGS=-lm
 OBJS=main.o multigrid.o
 TARGET=star
